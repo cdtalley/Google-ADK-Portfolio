@@ -64,7 +64,7 @@ def get_case_study_by_slug(slug: str) -> dict[str, Any]:
 
 
 def get_interview_talking_points(theme: str) -> dict[str, Any]:
-    """Returns curated talking points. theme: agents_adk | evaluation | leadership."""
+    """Returns curated talking points. theme: agents_adk | evaluation | leadership | hiring_manager."""
     themes = INVENTORY.get("interview_themes", {})
     key = theme.strip().lower()
     if key not in themes:

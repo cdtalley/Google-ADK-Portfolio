@@ -1,4 +1,4 @@
-import { useCallback, useRef, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 
 const APP_NAME = "drake_talley_adk";
 const USER_ID = "recruiter_ui";
@@ -31,12 +31,29 @@ type ChatMsg = { role: "user" | "assistant"; text: string };
 type TraceItem = {
   id: string;
   author?: string;
-  kind: "call" | "result" | "text" | "meta";
+  kind: "call" | "result" | "text" | "meta" | "error";
   title: string;
   body?: string;
 };
 
+/** ADK serializes with camelCase; tolerate snake_case from older payloads. */
+function getPartField(part: Record<string, unknown>, camel: string, snake: string): unknown {
+  if (part[camel] != null) return part[camel];
+  return part[snake];
+}
+
 function summarizeEvent(ev: Record<string, unknown>): TraceItem[] {
+  if (ev.error != null) {
+    return [
+      {
+        id: String(ev.id ?? crypto.randomUUID()),
+        kind: "error",
+        title: "Stream error",
+        body: String(ev.error),
+      },
+    ];
+  }
+
   const id = String(ev.id ?? crypto.randomUUID());
   const author = typeof ev.author === "string" ? ev.author : undefined;
   const content = ev.content as Record<string, unknown> | undefined;
@@ -45,29 +62,29 @@ function summarizeEvent(ev: Record<string, unknown>): TraceItem[] {
 
   for (const p of parts) {
     const part = p as Record<string, unknown>;
-    if (part.functionCall) {
-      const fc = part.functionCall as Record<string, unknown>;
+    const fc = getPartField(part, "functionCall", "function_call") as Record<string, unknown> | undefined;
+    if (fc && typeof fc === "object") {
       const name = String(fc.name ?? "?");
       const args = fc.args;
       out.push({
-        id: `${id}-call-${name}`,
+        id: `${id}-call-${name}-${out.length}`,
         author,
         kind: "call",
         title: `Tool call: ${name}`,
-        body: JSON.stringify(args, null, 2),
+        body: JSON.stringify(args ?? {}, null, 2),
       });
     }
-    if (part.functionResponse) {
-      const fr = part.functionResponse as Record<string, unknown>;
+    const fr = getPartField(part, "functionResponse", "function_response") as Record<string, unknown> | undefined;
+    if (fr && typeof fr === "object") {
       const name = String(fr.name ?? "?");
       const response = fr.response;
       out.push({
-        id: `${id}-res-${name}`,
+        id: `${id}-res-${name}-${out.length}`,
         author,
         kind: "result",
         title: `Result: ${name}`,
         body:
-          typeof response === "object"
+          typeof response === "object" && response !== null
             ? JSON.stringify(response, null, 2)
             : String(response ?? ""),
       });
@@ -76,11 +93,11 @@ function summarizeEvent(ev: Record<string, unknown>): TraceItem[] {
       const t = String(part.text);
       if (t.trim()) {
         out.push({
-          id: `${id}-txt`,
+          id: `${id}-txt-${out.length}`,
           author,
           kind: "text",
           title: "Model text",
-          body: t.length > 2000 ? `${t.slice(0, 2000)}…` : t,
+          body: t,
         });
       }
     }
@@ -91,49 +108,26 @@ function summarizeEvent(ev: Record<string, unknown>): TraceItem[] {
       id,
       author,
       kind: "meta",
-      title: "Event",
-      body: JSON.stringify(ev, null, 2).slice(0, 4000),
+      title: "Event (raw)",
+      body: JSON.stringify(ev, null, 2).slice(0, 6000),
     });
   }
 
   return out;
 }
 
-async function parseSseStream(
-  reader: ReadableStreamDefaultReader<Uint8Array>,
-  onEvent: (obj: Record<string, unknown>) => void
-): Promise<void> {
-  const dec = new TextDecoder();
-  let buf = "";
-  for (;;) {
-    const { done, value } = await reader.read();
-    if (done) break;
-    buf += dec.decode(value, { stream: true });
-    buf = buf.replace(/\r\n/g, "\n");
-    let idx: number;
-    while ((idx = buf.indexOf("\n\n")) >= 0) {
-      const chunk = buf.slice(0, idx);
-      buf = buf.slice(idx + 2);
-      for (const line of chunk.split("\n")) {
-        const t = line.trim();
-        if (t.startsWith("data:")) {
-          const json = t.slice(5).trim();
-          if (json && json !== "[DONE]") {
-            try {
-              onEvent(JSON.parse(json) as Record<string, unknown>);
-            } catch {
-              /* ignore */
-            }
-          }
-        }
-      }
-    }
-  }
+function collectAssistantText(items: TraceItem[]): string {
+  return items
+    .filter((i) => i.kind === "text" && i.body)
+    .map((i) => i.body!)
+    .join("");
 }
+
+const delay = (ms: number) => new Promise((r) => setTimeout(r, ms));
 
 const shell: React.CSSProperties = {
   display: "grid",
-  gridTemplateColumns: "1fr 380px",
+  gridTemplateColumns: "1fr min(420px, 38vw)",
   gap: 0,
   minHeight: "100vh",
 };
@@ -154,17 +148,32 @@ const tracePanel: React.CSSProperties = {
 
 export default function App() {
   const [sessionId, setSessionId] = useState(() => crypto.randomUUID().slice(0, 12));
+  const [apiOk, setApiOk] = useState<boolean | null>(null);
   const [messages, setMessages] = useState<ChatMsg[]>([
     {
       role: "assistant",
-      text: "Select a **preset** (Meridian AML, RevOps, …). **Live:** watch the **Trace** panel stream each **tool call** and **agent** (`author`) as Gemini runs—multi-agent work, not a canned script. Requires **`adk api_server --port 8000`** and this UI via **`npm run dev`** on port **5173** (proxy fixes ADK origin checks).",
+      text: "This UI calls ADK **`/run`** (full agent turn) through the Vite proxy—**reliable** with Gemini + tools + sub-agents. After you send, watch the **Trace** panel **replay** each tool step. Start **`adk api_server --port 8000`** from the repo root and keep **`GOOGLE_API_KEY`** set.",
     },
   ]);
   const [input, setInput] = useState("");
   const [trace, setTrace] = useState<TraceItem[]>([]);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const assistantBuf = useRef("");
+  const [stepLabel, setStepLabel] = useState("");
+
+  useEffect(() => {
+    let cancelled = false;
+    fetch("/list-apps")
+      .then((r) => {
+        if (!cancelled) setApiOk(r.ok);
+      })
+      .catch(() => {
+        if (!cancelled) setApiOk(false);
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, []);
 
   const createSession = useCallback(async (sid: string) => {
     const r = await fetch(`/apps/${APP_NAME}/users/${USER_ID}/sessions/${sid}`, {
@@ -183,9 +192,9 @@ export default function App() {
       const trimmed = text.trim();
       if (!trimmed || busy) return;
       setError(null);
+      setStepLabel("");
       setBusy(true);
       setMessages((m) => [...m, { role: "user", text: trimmed }]);
-      assistantBuf.current = "";
       setMessages((m) => [...m, { role: "assistant", text: "" }]);
 
       let sid = sessionId;
@@ -198,7 +207,8 @@ export default function App() {
           if (!ok) throw new Error("Could not create ADK session");
         }
 
-        const res = await fetch("/run_sse", {
+        setStepLabel("Running agent (Gemini + tools)…");
+        const res = await fetch("/run", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
@@ -209,7 +219,6 @@ export default function App() {
               role: "user",
               parts: [{ text: trimmed }],
             },
-            streaming: true,
           }),
         });
 
@@ -218,26 +227,54 @@ export default function App() {
           throw new Error(t || `API ${res.status}`);
         }
 
-        const reader = res.body?.getReader();
-        if (!reader) throw new Error("No response body");
+        const raw = await res.json();
+        if (!Array.isArray(raw)) {
+          throw new Error(`Expected event array from /run, got: ${JSON.stringify(raw).slice(0, 200)}`);
+        }
 
-        await parseSseStream(reader, (ev) => {
+        const events = raw as Record<string, unknown>[];
+        if (events.length === 0) {
+          throw new Error("Agent returned no events — check GOOGLE_API_KEY and model access.");
+        }
+
+        setTrace([]);
+        let accumulated: TraceItem[] = [];
+        let textSoFar = "";
+
+        for (let i = 0; i < events.length; i++) {
+          const ev = events[i];
           const items = summarizeEvent(ev);
-          setTrace((prev) => [...prev, ...items]);
-          for (const it of items) {
-            if (it.kind === "text" && it.body) {
-              assistantBuf.current += it.body;
-            }
-          }
-          const acc = assistantBuf.current;
+          accumulated = [...accumulated, ...items];
+          setTrace(accumulated);
+          textSoFar = collectAssistantText(accumulated);
           setMessages((m) => {
             const copy = [...m];
             const last = copy.length - 1;
             if (last >= 0 && copy[last].role === "assistant") {
-              copy[last] = { role: "assistant", text: acc || "…" };
+              copy[last] = {
+                role: "assistant",
+                text: textSoFar || `Working… (${i + 1}/${events.length} events)`,
+              };
             }
             return copy;
           });
+          setStepLabel(`Trace: step ${i + 1} / ${events.length}`);
+          await delay(Math.min(120, 40 + i * 8));
+        }
+
+        setMessages((m) => {
+          const copy = [...m];
+          const last = copy.length - 1;
+          if (last >= 0 && copy[last].role === "assistant") {
+            const finalText = collectAssistantText(accumulated).trim();
+            copy[last] = {
+              role: "assistant",
+              text:
+                finalText ||
+                "Run finished but no model text was parsed — expand **Event (raw)** rows in Trace to inspect the payload.",
+            };
+          }
+          return copy;
         });
       } catch (e) {
         const msg = e instanceof Error ? e.message : String(e);
@@ -248,13 +285,14 @@ export default function App() {
           if (last >= 0 && copy[last].role === "assistant") {
             copy[last] = {
               role: "assistant",
-              text: `**Error:** ${msg}\n\nStart API server from repo root: \`adk api_server --port 8000\``,
+              text: `**Error:** ${msg}\n\n— Is \`adk api_server --port 8000\` running from the repo root?\n— Is \`GOOGLE_API_KEY\` set?\n— Open this app only via \`npm run dev\` (port 5173), not a static file.`,
             };
           }
           return copy;
         });
       } finally {
         setBusy(false);
+        setStepLabel("");
       }
     },
     [busy, createSession, sessionId]
@@ -274,13 +312,18 @@ export default function App() {
             Drake Talley — Google ADK portfolio
           </div>
           <div style={{ fontSize: "0.8rem", color: "#8b9bab", marginTop: 4 }}>
-            {busy ? (
-              <span style={{ color: "#4dd0e1" }}>Running agent — trace updating…</span>
+            API{" "}
+            {apiOk === null ? (
+              <span>checking…</span>
+            ) : apiOk ? (
+              <span style={{ color: "#81c784" }}>● connected</span>
             ) : (
-              <>
-                Live SSE · session <code style={{ color: "#80cbc4" }}>{sessionId}</code>
-              </>
-            )}
+              <span style={{ color: "#e57373" }}>● offline — start adk api_server :8000</span>
+            )}{" "}
+            · session <code style={{ color: "#80cbc4" }}>{sessionId}</code>
+            {stepLabel ? (
+              <span style={{ color: "#4dd0e1", marginLeft: 8 }}>{stepLabel}</span>
+            ) : null}
           </div>
         </header>
 
@@ -293,12 +336,13 @@ export default function App() {
               onClick={() => sendMessage(p.text)}
               style={{
                 fontSize: "0.75rem",
-                padding: "6px 10px",
+                padding: "8px 12px",
                 borderRadius: 6,
                 border: "1px solid #37474f",
-                background: "#1c2832",
-                color: "#b0bec5",
+                background: busy ? "#263238" : "#1c2832",
+                color: "#eceff1",
                 cursor: busy ? "wait" : "pointer",
+                fontWeight: 500,
               }}
             >
               {p.label}
@@ -328,9 +372,11 @@ export default function App() {
                 border: "1px solid #37474f",
                 whiteSpace: "pre-wrap",
                 fontSize: "0.9rem",
+                lineHeight: 1.45,
               }}
             >
-              {msg.text || (msg.role === "assistant" && busy ? "…" : "")}
+              {msg.text ||
+                (msg.role === "assistant" && busy ? "…" : "")}
             </div>
           ))}
         </div>
@@ -343,7 +389,9 @@ export default function App() {
             <input
               value={input}
               onChange={(e) => setInput(e.target.value)}
-              onKeyDown={(e) => e.key === "Enter" && !e.shiftKey && (e.preventDefault(), sendMessage(input))}
+              onKeyDown={(e) =>
+                e.key === "Enter" && !e.shiftKey && (e.preventDefault(), sendMessage(input), setInput(""))
+              }
               placeholder="Message drake_talley_portfolio…"
               disabled={busy}
               style={{
@@ -388,22 +436,23 @@ export default function App() {
             fontSize: "0.9rem",
           }}
         >
-          Trace · real-time tools & agents
+          Trace · tools & agents (live replay)
         </div>
         <div style={{ fontSize: "0.72rem", padding: "8px 14px", color: "#78909c" }}>
-          <strong>Agents:</strong> drake_talley_portfolio → technical_proof | executive_voice |
-          revops_lead_orchestrator | aml_alert_orchestrator (+ specialists)
+          Each row is one ADK event: **functionCall** → **functionResponse** → model **text**. Authors show
+          which agent acted (e.g. aml_alert_orchestrator).
         </div>
         <div style={{ flex: 1, overflowY: "auto", padding: "0 10px 16px" }}>
           {trace.length === 0 ? (
             <div style={{ color: "#546e7a", padding: 12, fontSize: "0.85rem" }}>
-              Run a preset to see **functionCall** / **functionResponse** and **author** stream here.
+              Run a preset — the trace fills as the agent executes tools (deterministic CRM / AML data + Gemini
+              reasoning).
             </div>
           ) : (
             trace.map((t, idx) => (
               <details
                 key={`${t.id}-${idx}`}
-                open={t.kind === "call" || t.kind === "result"}
+                open={t.kind === "call" || t.kind === "result" || t.kind === "error"}
                 style={{
                   marginBottom: 8,
                   border: "1px solid #263238",
@@ -428,7 +477,9 @@ export default function App() {
                             ? "#a5d6a7"
                             : t.kind === "text"
                               ? "#90caf9"
-                              : "#b0bec5",
+                              : t.kind === "error"
+                                ? "#ef9a9a"
+                                : "#b0bec5",
                     }}
                   >
                     [{t.kind}]
@@ -447,6 +498,7 @@ export default function App() {
                       overflow: "auto",
                       color: "#cfd8dc",
                       whiteSpace: "pre-wrap",
+                      maxHeight: 320,
                     }}
                   >
                     {t.body}

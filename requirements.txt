@@ -1,1 +1,5 @@
-google-adk>=1.0.0
+# Runtime (portfolio agents)
+google-adk>=1.0.0,<2.0.0
+
+# CI / local tests (pip install -r requirements.txt in workflow)
+pytest>=8.0.0

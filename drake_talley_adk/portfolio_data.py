@@ -534,5 +534,14 @@ INVENTORY: dict[str, Any] = {
             "I translate model behavior into **policy and operations**—rules adopted, "
             "downtime avoided, dollars saved.",
         ],
+        "hiring_manager": [
+            "For **agentic AI + GCP**: this repo is runnable proof—**multi-agent** ADK, "
+            "**tool-grounded** résumé data, and **two** operational demos (RevOps + "
+            "synthetic **Meridian** AML triage). Ask me to walk the **Trace** or the code.",
+            "I bring **measured** production ML (Vertex, BigQuery, fraud scale) and ship "
+            "**evaluation-minded** agent design—not prompt-only demos.",
+            "Themes: **get_verified_track_record** for real metrics; **case_studies** are "
+            "labeled synthetic ADK exercises only.",
+        ],
     },
 }
