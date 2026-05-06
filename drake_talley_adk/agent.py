@@ -4,6 +4,7 @@ from __future__ import annotations
 
 from google.adk.agents import Agent
 
+from .aml_alert_agents import aml_alert_orchestrator
 from .revenue_ops_agents import revops_lead_orchestrator
 from .portfolio_tools import (
     get_adk_expertise,
@@ -76,6 +77,10 @@ Operating rules:
    prioritization** → transfer_to_agent(agent_name='revops_lead_orchestrator'). That
    system solves a **real business problem** with **synthetic CRM** tools—label demo
    data when summarizing.
+6) For **BSA/AML alert triage**, **alert_id** (e.g. ALT-20001), **SAR prep**, **fraud
+   alert disposition**, **Meridian** → transfer_to_agent(agent_name='aml_alert_orchestrator').
+   **Meridian Trust & Savings** and all alerts are **synthetic**—a real-class ops
+   problem (analyst throughput, escalation, auditable reasons), not a real bank.
 
 Tone: confident, precise, recruiter-friendly—substance over hype.
 """
@@ -107,7 +112,8 @@ root_agent = Agent(
     name="drake_talley_portfolio",
     description=(
         "Drake Talley's public portfolio: résumé-grounded Q&A, ADK case-study vignettes, "
-        "and a **RevOps lead-triage** multi-agent system (real problem; synthetic CRM)."
+        "**RevOps lead-triage**, and **Meridian (synthetic) BSA/AML alert triage**—multi-agent "
+        "systems with tool-grounded business logic."
     ),
     instruction=_ROOT_INSTRUCTION,
     tools=_PORTFOLIO_TOOLS,
@@ -115,5 +121,6 @@ root_agent = Agent(
         technical_proof,
         executive_voice,
         revops_lead_orchestrator,
+        aml_alert_orchestrator,
     ],
 )

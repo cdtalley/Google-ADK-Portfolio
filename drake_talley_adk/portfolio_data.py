@@ -325,20 +325,23 @@ INVENTORY: dict[str, Any] = {
     "this_repository": {
         "title": "Public ADK portfolio (GitHub)",
         "purpose": (
-            "A **live, conversational** portfolio: recruiters run ADK Web, select "
-            "`drake_talley_adk`, and explore synthetic **multi-industry** agent "
-            "scenarios while inspecting real **ADK** code."
+            "A **live, conversational** portfolio: recruiters run **ADK Web** or "
+            "`adk api_server` + **`recruiter_demo`** UI, select `drake_talley_adk`, and "
+            "explore synthetic **RevOps**, **Meridian BSA/AML**, and case-study scenarios "
+            "while inspecting **Google ADK** code."
         ),
         "stack": [
             "google-adk",
             "Google Gemini (via ADK)",
             "Python 3.10+",
+            "Optional: Vite + React recruiter UI (`recruiter_demo/`) against `/run_sse`.",
         ],
         "what_to_look_for_in_code": [
-            "`root_agent` with `sub_agents` — classic ADK multi-agent composition.",
+            "`root_agent` with `sub_agents` — concierge + `technical_proof` + `executive_voice`.",
+            "`revops_lead_orchestrator` + partitioned `REVOPS_TOOLS_*` — sales lead triage subgraph.",
+            "`aml_alert_orchestrator` + partitioned `AML_TOOLS_*` — **Meridian (synthetic)** BSA/AML triage subgraph.",
             "`get_verified_track_record` — résumé facts separated from synthetic vignettes.",
-            "`portfolio_tools.py` — function tools as the knowledge API.",
-            "`portfolio_data.py` — verified employment + ADK scenario library.",
+            "`portfolio_tools.py` / `portfolio_data.py` — knowledge API + data inventory.",
         ],
     },
     "case_studies": [
