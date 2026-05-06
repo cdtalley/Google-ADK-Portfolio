@@ -4,6 +4,7 @@ from __future__ import annotations
 
 from google.adk.agents import Agent
 
+from .revenue_ops_agents import revops_lead_orchestrator
 from .portfolio_tools import (
     get_adk_expertise,
     get_capability_matrix,
@@ -71,6 +72,10 @@ Operating rules:
 3) For hiring narrative or exec pitch, transfer_to_agent(agent_name='executive_voice').
 4) Synthetic ADK vignettes: list_case_study_slugs + get_case_study_by_slug (label as
    illustrative only).
+5) For **RevOps / inbound lead triage**, **lead_id**, **SLA routing**, **pipeline
+   prioritization** → transfer_to_agent(agent_name='revops_lead_orchestrator'). That
+   system solves a **real business problem** with **synthetic CRM** tools—label demo
+   data when summarizing.
 
 Tone: confident, precise, recruiter-friendly—substance over hype.
 """
@@ -101,10 +106,14 @@ root_agent = Agent(
     model=_MODEL,
     name="drake_talley_portfolio",
     description=(
-        "Drake Talley's public portfolio agent: Google ADK multi-agent demo with "
-        "synthetic cross-industry scenarios and tool-grounded answers."
+        "Drake Talley's public portfolio: résumé-grounded Q&A, ADK case-study vignettes, "
+        "and a **RevOps lead-triage** multi-agent system (real problem; synthetic CRM)."
     ),
     instruction=_ROOT_INSTRUCTION,
     tools=_PORTFOLIO_TOOLS,
-    sub_agents=[technical_proof, executive_voice],
+    sub_agents=[
+        technical_proof,
+        executive_voice,
+        revops_lead_orchestrator,
+    ],
 )

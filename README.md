@@ -26,6 +26,7 @@
 Not a slideshow—a **runnable agent app**:
 
 - **Multi-agent** `root_agent` + specialists (`technical_proof`, `executive_voice`) with LLM-driven **transfer**.
+- **RevOps lead triage** subsystem (`revops_lead_orchestrator`): addresses a **real** operating problem—**prioritizing finite sales capacity on policy-safe, high-intent inbound leads**—using **function tools** over a **synthetic** CRM (`revenue_ops_data.py`). Specialists: **policy / scoring / next-best-action**.
 - **Tool-grounded** answers: résumé facts live in `portfolio_data.py` → exposed via `portfolio_tools.py` so the model **quotes your real wins**, not hallucinated ones.
 - **Synthetic case studies** (healthcare, fintech, retail, etc.) are **deliberate ADK design exercises**—clearly separated from **verified** employment data.
 
@@ -41,7 +42,28 @@ adk web --port 8000
 
 Open `http://localhost:8000` → select **`drake_talley_adk`**.
 
-**Try asking:** “Summarize Drake’s verified GCP and Vertex wins,” “How is this ADK project structured?” “Compare synthetic case studies vs real experience.”
+### 5-minute reviewer path
+
+**Google ADK in one line:** An `Agent` combines a Gemini model, **instructions**, **function tools** (Python callables returning structured data), and optional **`sub_agents`**. Delegation is **`transfer_to_agent`**: the model chooses when to hand off to a specialist instead of hard-coding orchestration in application code.
+
+**Copy-paste prompts** (each proves a different capability):
+
+1. **Verified résumé grounding** — “Use **get_verified_track_record** and give three bullets on Drake’s SentriLock outcomes (field failure, downtime, cloud cost). Do not invent metrics.”
+2. **Synthetic case study (ADK patterns)** — “Call **list_case_study_slugs**, then **get_case_study_by_slug** for `fintech-compliance-analyst`. Summarize the approach and label it **synthetic / illustrative**.”
+3. **RevOps multi-agent + CRM tools** — “For **revops_lead_orchestrator**: triage lead **LD-10043**—policy/eligibility, priority score and tier, and next-best action. Say explicitly that leads in `revenue_ops_data.py` are **demo records**.”
+
+**File map** (if you only read a few files):
+
+| File | What it shows |
+|------|----------------|
+| [`drake_talley_adk/agent.py`](drake_talley_adk/agent.py) | `root_agent`, portfolio specialists, `sub_agents`, shared portfolio tools |
+| [`drake_talley_adk/revenue_ops_agents.py`](drake_talley_adk/revenue_ops_agents.py) | RevOps orchestrator + policy / scoring / action subgraph |
+| [`drake_talley_adk/portfolio_tools.py`](drake_talley_adk/portfolio_tools.py) | Tool API over résumé + case-study data |
+| [`drake_talley_adk/revenue_ops_tools.py`](drake_talley_adk/revenue_ops_tools.py) | Deterministic CRM tools; partitioned tool lists per specialist |
+| [`drake_talley_adk/portfolio_data.py`](drake_talley_adk/portfolio_data.py) | **Verified** track record vs **synthetic** vignettes (data only) |
+| [`ARCHITECTURE.md`](ARCHITECTURE.md) | Why two agent hierarchies, tool rules, production next steps |
+
+**Try asking:** “What business problem does the RevOps agent solve?” “Triage lead **LD-10043**—policy, score, and next action.” “Summarize Drake’s verified Vertex wins.” “How is this ADK repo structured?”
 
 ---
 
@@ -58,7 +80,7 @@ Open `http://localhost:8000` → select **`drake_talley_adk`**.
 
 ## Disclosure
 
-Synthetic vignettes in `case_studies` are **fictional** scenarios for **ADK** pattern demos. **Employment, clients, and quantitative claims** in `verified_track_record` are transcribed from Drake’s résumé for tool-grounded responses.
+Synthetic vignettes in `case_studies` are **fictional** scenarios for **ADK** pattern demos. **RevOps** companies/leads in `revenue_ops_data.py` are **demo records** for a real-world triage pattern. **Employment, clients, and quantitative claims** in `verified_track_record` are transcribed from Drake’s résumé for tool-grounded responses.
 
 ADK **Web** is [development-only per Google](https://google.github.io/adk-docs/); production = Cloud Run, Vertex AI Agent Engine, or `adk api_server` patterns from ADK docs.
 

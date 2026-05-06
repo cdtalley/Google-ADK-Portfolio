@@ -66,10 +66,12 @@ INVENTORY: dict[str, Any] = {
     "verified_track_record": {
         "source": "Résumé (Drake Talley) — structured for tool-grounded answers.",
         "summary": (
-            "Senior data scientist with a strong track record delivering "
-            "production-grade machine learning on large-scale cloud platforms—from "
-            "national education analytics and IoT predictive maintenance to federal "
-            "fraud programs and Wall Street GenAI search."
+            "Senior data scientist with a strong track record delivering production-grade "
+            "machine learning on large-scale cloud platforms. Led predictive lead-scoring "
+            "and student retention for a national education services client; improved fraud "
+            "detection accuracy by **30%** on **20TB+** data; designs robust feature "
+            "engineering, cloud cost optimization, and business-facing model outcomes. "
+            "Seeking roles where data-driven decisions and measurable impact matter."
         ),
         "quantified_highlights": [
             "**+30%** fraud-detection accuracy on **20TB+** data (CyberData / SSA context; Spark, SQL, Databricks; federal security requirements).",
@@ -95,8 +97,11 @@ INVENTORY: dict[str, Any] = {
                 "dates": "Mar 2026 – Present",
                 "location": "Remote",
                 "highlights": [
-                    "End-to-end **biotech application**: requirements → production-ready—system design, backend, frontend workflows, deployment planning.",
-                    "Solo contract engineer owning product scope, integrations, data pipelines, and client communication under **NDA / compliance** discipline.",
+                    "**Privacy & compliance**: applied data privacy, security, and compliance practices; modeling and integrations stayed **NDA-aligned** with client policies.",
+                    "End-to-end **biotech application**: requirements through production-ready delivery—system design, backend services, frontend workflows, deployment planning.",
+                    "Architected core **product stack**: scalable **APIs**, data flows, and user-facing features from client goals.",
+                    "Backend logic, **integrations**, and **data pipelines** for ingestion, processing, and reporting across the lifecycle.",
+                    "Solo **contract engineer**: product scoping, technical tradeoffs, iterative delivery, and client communication.",
                 ],
             },
             {
@@ -105,10 +110,10 @@ INVENTORY: dict[str, Any] = {
                 "dates": "Jan 2026 – Feb 2026",
                 "location": "Remote",
                 "highlights": [
-                    "**Vertex AI Workbench** end-to-end ML: data prep → train → evaluate → deploy/monitor.",
-                    "Predictive **lead scoring** + **student retention** from CRM, SIS, and digital engagement signals.",
-                    "Reusable **feature-engineering framework** (temporal rollups, interactions, encoding, scaling).",
-                    "Classical ML (logistic regression, trees, ensembles) tuned for **limited data** with explainable outputs.",
+                    "Contract DS: **Python**, **SQL**, **Git**, **Vertex AI Workbench** on enrollment + performance data—insights for program and operational decisions.",
+                    "**Vertex AI** end-to-end ML (prep → train → evaluate → deploy/monitor): **lead scoring** + **student retention** using CRM, SIS, and digital engagement signals.",
+                    "Reusable **feature-engineering framework** for tabular data (temporal rollups, interactions, encoding, scaling/normalization) in Workbench—faster datasets, more consistent quality.",
+                    "Classical ML (logistic regression, tree-based methods, ensembles) tuned under **sparse data**; explainable predictions for enrollment forecasting and planning.",
                 ],
             },
             {
@@ -117,11 +122,12 @@ INVENTORY: dict[str, Any] = {
                 "dates": "Jun 2022 – Mar 2025",
                 "location": "Remote",
                 "highlights": [
-                    "Led enterprise DS on **2.5TB+**; **Vertex AI**, **BigQuery**, **Cloud Functions**.",
-                    "Deployed logistic regression, random forests, gradient boosting for **predictive maintenance** and risk—**80%** reduction in field box failures.",
-                    "Vertex AI **Pipelines** + **Cloud Composer** E2E ML; **30%** faster rollouts.",
-                    "**35%** downtime reduction; **50%** infra cost reduction.",
-                    "Explainability + diagnostics for executives; **Looker** dashboards; models embedded in workflows.",
+                    "Led enterprise data science on **2.5TB+** production data—**Vertex AI**, **BigQuery**, **Cloud Functions** for org-wide decision support.",
+                    "Classical ML (logistic regression, random forests, gradient-boosted methods) for **predictive maintenance** and risk—**80%** reduction in operational events where field devices failed.",
+                    "Reusable **feature pipelines** for large-scale tabular data—stability, interpretability, and lift.",
+                    "E2E ML on **Vertex AI Pipelines** + **Cloud Composer** (ingestion → features → train → evaluate → deploy); **30%** faster model rollout.",
+                    "**35%** operational downtime reduction via predictive modeling and proactive alerting; **50%** cloud infrastructure cost reduction.",
+                    "Diagnostics and explainability for executives; **Looker** dashboards; models embedded in workflows with product, engineering, and analytics.",
                 ],
             },
             {
@@ -130,10 +136,11 @@ INVENTORY: dict[str, Any] = {
                 "dates": "Jun 2022 – Feb 2024",
                 "location": "",
                 "highlights": [
-                    "**Morgan Stanley**: **RAG** with **LangChain** + **GPT-3** on **BigQuery** across millions of financial documents.",
-                    "**Lumen**: predictive fulfillment ML; **US Bank**: fraud (anomaly + classification); **Wells Fargo**: **DAQC** remediation governance.",
-                    "**Verizon**: led **8-person** offshore team; Chaos Engineering exec reporting.",
-                    "Global team leadership, mentoring, solution architecture, ROI-focused exec presentations.",
+                    "**Morgan Stanley**: **RAG** (**LangChain**, **GPT-3**, **BigQuery**) for NLP-driven enterprise search across **millions** of financial documents.",
+                    "**Lumen**: predictive fulfillment ML; **US Bank**: fraud detection (anomaly + classification); **Wells Fargo**: **DAQC** program—validation that improved remediation accuracy and **compliance governance**.",
+                    "**Verizon**: managed **8-person** offshore DS team; monthly **Chaos Engineering** executive reports on infrastructure resilience.",
+                    "**Discovery**, solution architecture, and **executive presentations** across engagements—ML/AI translated to outcomes and ROI.",
+                    "Led a **global** DS team, mentored juniors on ML pipelines and **SQL**, on-time predictive deployments.",
                 ],
             },
             {
@@ -142,10 +149,11 @@ INVENTORY: dict[str, Any] = {
                 "dates": "Jan 2021 – Jun 2022",
                 "location": "Remote",
                 "highlights": [
-                    "**+30%** fraud-detection accuracy; **20TB+**; **Spark**, **SQL**, **Databricks**; federal requirements.",
-                    "Weekly **executive briefings**; **three** fraud rules adopted by federal leadership.",
-                    "**Azure**, **Spark**, **Kafka** for VLDB-scale ingestion and real-time fraud pipelines.",
-                    "**PyTorch** model development with compliance alignment; **LangChain** NLP prototypes.",
+                    "**30%** fraud-detection accuracy improvement; production **Python** ML on **20TB+** under federal security requirements—**Spark**, **SQL**, **Databricks**.",
+                    "**SSA** fraud-prevention context: briefings that turned ML into operational/policy recommendations; **three** new fraud-detection rules adopted by federal leadership.",
+                    "**VLDB** architecture: **Azure**, **Spark**, **Kafka** for ingestion, feature engineering, and real-time fraud detection.",
+                    "Mission-critical systems at scale; **Agile** cross-functional teams; **PyTorch** + **Python** for development, evaluation, compliance alignment.",
+                    "**LangChain** integrated into NLP pipeline prototypes and shared libraries for document intelligence and compliance monitoring.",
                 ],
             },
             {
@@ -154,8 +162,9 @@ INVENTORY: dict[str, Any] = {
                 "dates": "Jan 2019 – Jan 2020",
                 "location": "Remote",
                 "highlights": [
-                    "Mentored production ML with **Python**, **PyTorch**, **SQL**; **Azure**, **Databricks**, **Spark**, **Kafka**.",
-                    "NLP / LLM project guidance; Agile iteration habits.",
+                    "Mentored **Python**, **PyTorch**, **SQL** on supervised/unsupervised projects—curriculum focused on real-world business solutions.",
+                    "Hands-on **Azure**, **Databricks**, **Spark**, **Kafka** for scalable pipelines and experimentation.",
+                    "Applied **NLP** and **LLM** project design; **Agile** iteration and rapid feedback loops.",
                 ],
             },
             {
@@ -164,9 +173,9 @@ INVENTORY: dict[str, Any] = {
                 "dates": "Apr 2017 – Jan 2020",
                 "location": "Augusta-Richmond County, GA",
                 "highlights": [
-                    "**30%** processing efficiency gain; **Python**, **SQL**, **Spark** on biometric / health data.",
-                    "**Databricks** + **Azure** pipelines with **HIPAA** awareness.",
-                    "ML + **SAS** for epidemiological analytics and resource planning.",
+                    "**30%** data-processing efficiency for public-health programs—**Python**, **SQL**, **Spark** on large biometric and health datasets.",
+                    "**Databricks** + **Azure** automated pipelines—ingestion and reporting with **HIPAA** compliance.",
+                    "ML and **SAS** for epidemiological studies—trends, predictive models, outbreak anticipation, resource allocation.",
                 ],
             },
         ],
@@ -182,12 +191,13 @@ INVENTORY: dict[str, Any] = {
                 ),
             },
             {
-                "name": "Student-Prediction (Collegis)",
+                "name": "Student-Prediction (Collegis Education)",
                 "url": "https://github.com/cdtalley/Student-Prediction",
                 "period": "Jan 2026 – Feb 2026",
                 "one_liner": (
-                    "Three-stage retention + lead ensemble (**XGBoost**, **LightGBM**); "
-                    "**FastAPI** + **Next.js 14** + **Superset**; Docker + config-driven deploy."
+                    "**Collegis**: three-stage retention + lead ensemble (**XGBoost**, **LightGBM**); "
+                    "**29-feature** lead-scoring model; **FastAPI** + **Next.js 14** + **Superset**; "
+                    "Docker + **config.yaml**; REST API into client CRM."
                 ),
             },
             {
@@ -221,7 +231,7 @@ INVENTORY: dict[str, Any] = {
         "education": [
             {
                 "institution": "University of Georgia",
-                "degree": "Bachelor of Science",
+                "degree": "Bachelor's of Science",
                 "dates": "Aug 2011 – May 2015",
                 "detail": "Athens, GA — GPA **3.8**",
             },
@@ -234,19 +244,23 @@ INVENTORY: dict[str, Any] = {
         ],
         "skills": [
             "Python",
+            "Git",
+            "Data science",
             "SQL",
             "Statistics",
+            "Data analysis",
             "Machine learning",
+            "AI/ML",
             "Generative AI",
             "LangChain",
             "LangGraph",
             "Google ADK",
-            "Google Cloud Platform",
-            "Vertex AI",
             "BigQuery",
-            "MLOps / pipelines",
+            "Google Cloud Platform (GCP)",
+            "Vertex AI",
+            "Cloud computing",
             "Docker",
-            "Git",
+            "MLOps / pipelines",
             "Data engineering (Spark, Kafka, Databricks)",
             "RAG & multi-agent systems",
         ],
