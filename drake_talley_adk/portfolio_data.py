@@ -11,7 +11,7 @@ from typing import Any
 INVENTORY: dict[str, Any] = {
     "portfolio_context": {
         "audience": (
-            "Recruiters and hiring managers reviewing this repository on GitHub."
+            "People reviewing this repository on GitHub."
         ),
         "data_policy": (
             "**Verified:** roles, clients, metrics, and projects in "
@@ -325,7 +325,7 @@ INVENTORY: dict[str, Any] = {
     "this_repository": {
         "title": "Public ADK portfolio (GitHub)",
         "purpose": (
-            "A **live, conversational** portfolio: recruiters run **ADK Web** or "
+            "A **live, conversational** portfolio: run **ADK Web** or "
             "`adk api_server` + **`recruiter_demo`** UI, select `drake_talley_adk`, and "
             "explore synthetic **RevOps**, **Meridian BSA/AML**, and case-study scenarios "
             "while inspecting **Google ADK** code."
@@ -334,7 +334,7 @@ INVENTORY: dict[str, Any] = {
             "google-adk",
             "Google Gemini (via ADK)",
             "Python 3.10+",
-            "Optional: Vite + React recruiter UI (`recruiter_demo/`) against `/run_sse`.",
+            "Optional: Vite + React UI (`recruiter_demo/`) proxied to ADK `/run` and `/apps`.",
         ],
         "what_to_look_for_in_code": [
             "`root_agent` with `sub_agents` — concierge + `technical_proof` + `executive_voice`.",
@@ -534,14 +534,12 @@ INVENTORY: dict[str, Any] = {
             "I translate model behavior into **policy and operations**—rules adopted, "
             "downtime avoided, dollars saved.",
         ],
-        "hiring_manager": [
-            "For **agentic AI + GCP**: this repo is runnable proof—**multi-agent** ADK, "
-            "**tool-grounded** résumé data, and **two** operational demos (RevOps + "
-            "synthetic **Meridian** AML triage). Ask me to walk the **Trace** or the code.",
-            "I bring **measured** production ML (Vertex, BigQuery, fraud scale) and ship "
-            "**evaluation-minded** agent design—not prompt-only demos.",
-            "Themes: **get_verified_track_record** for real metrics; **case_studies** are "
-            "labeled synthetic ADK exercises only.",
+        "technical_screen": [
+            "This repo is runnable **Google ADK**: **multi-agent** composition, "
+            "**tool-grounded** résumé data, RevOps + synthetic **Meridian** AML triage.",
+            "Production ML on **Vertex / BigQuery** at scale; agent work is **test-backed** "
+            "(`pytest` on tools) and **trace-visible** in `recruiter_demo`.",
+            "**get_verified_track_record** = résumé facts; **case_studies** = synthetic ADK vignettes only.",
         ],
     },
 }

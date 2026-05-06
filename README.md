@@ -8,7 +8,7 @@
 
 ---
 
-## Why hiring managers stop scrolling
+## Highlights
 
 - **Wall Street + federal + cloud-native:** Delivered **RAG** (LangChain + GPT-3) on **Google BigQuery** for **Morgan Stanley** (via Infosys); **+30%** fraud-detection lift on **20TB+** workloads with federal-grade constraints; **DAQC / governance** at **Wells Fargo**; **fraud** models at **US Bank**; **Chaos Engineering** leadership reporting at **Verizon** (managed an **8-person** offshore team).
 - **Owns the full ML product loop:** At **SentriLock**, **2.5TB+** production data—**Vertex AI**, **BigQuery**, **Cloud Functions**; **80%** reduction in a critical **field-device failure** class; **35%** downtime reduction; **50%** cloud cost reduction; **30%** faster model rollout (**Vertex AI Pipelines** + **Cloud Composer**).
@@ -28,7 +28,7 @@ Not a slideshow—a **runnable agent app**:
 - **Multi-agent** `root_agent` + specialists (`technical_proof`, `executive_voice`) with LLM-driven **transfer**.
 - **RevOps lead triage** subsystem (`revops_lead_orchestrator`): addresses a **real** operating problem—**prioritizing finite sales capacity on policy-safe, high-intent inbound leads**—using **function tools** over a **synthetic** CRM (`revenue_ops_data.py`). Specialists: **policy / scoring / next-best-action**.
 - **Meridian BSA/AML alert triage** (`aml_alert_orchestrator`): **Meridian Trust & Savings (synthetic)**—**real-class** financial-crime ops problem (**analyst throughput**, **escalation**, **auditable reasons**) over **synthetic** alerts (`aml_alert_data.py`). Specialists: **policy / risk severity / disposition** with partitioned `AML_TOOLS_*`.
-- **Recruiter demo UI** (`recruiter_demo/`): **Vite + React** mission-control chat with **live SSE trace** (tool calls, agent authors) against `adk api_server`—better than slides for hiring conversations.
+- **Web UI** (`recruiter_demo/`): **Vite + React** chat plus **trace replay** of tool calls and agent authors against `adk api_server` (`POST /run`).
 - **Tool-grounded** answers: résumé facts live in `portfolio_data.py` → exposed via `portfolio_tools.py` so the model **quotes your real wins**, not hallucinated ones.
 - **Synthetic case studies** (healthcare, fintech, retail, etc.) are **deliberate ADK design exercises**—clearly separated from **verified** employment data.
 
@@ -44,7 +44,7 @@ adk web --port 8000
 
 Open `http://localhost:8000` → select **`drake_talley_adk`**.
 
-### Recruiter demo UI (streaming + tool trace)
+### Web UI (`recruiter_demo`)
 
 Terminal **A** — from this repo root (folder that contains `drake_talley_adk/`):
 
@@ -69,7 +69,7 @@ Use **preset prompts** for one-click demos. The UI calls ADK **`POST /run`** (fu
 **If you still see “origin not allowed”:** restart Vite after `git pull`, or run ADK with explicit CORS:  
 `adk api_server --port 8000 --allow_origins http://localhost:5173 --allow_origins http://127.0.0.1:5173`
 
-### 5-minute reviewer path
+### Quick demo prompts
 
 **Google ADK in one line:** An `Agent` combines a Gemini model, **instructions**, **function tools** (Python callables returning structured data), and optional **`sub_agents`**. Delegation is **`transfer_to_agent`**: the model chooses when to hand off to a specialist instead of hard-coding orchestration in application code.
 
@@ -90,7 +90,7 @@ Use **preset prompts** for one-click demos. The UI calls ADK **`POST /run`** (fu
 | [`drake_talley_adk/revenue_ops_tools.py`](drake_talley_adk/revenue_ops_tools.py) | Deterministic CRM tools; partitioned tool lists per specialist |
 | [`drake_talley_adk/aml_alert_agents.py`](drake_talley_adk/aml_alert_agents.py) | Meridian (synthetic) AML orchestrator + policy / risk / disposition |
 | [`drake_talley_adk/aml_alert_tools.py`](drake_talley_adk/aml_alert_tools.py) | Deterministic alert tools; `AML_TOOLS_*` partitions |
-| [`recruiter_demo/`](recruiter_demo/) | React UI: SSE chat + trace panel for `adk api_server` |
+| [`recruiter_demo/`](recruiter_demo/) | React UI: `POST /run` + trace replay via Vite proxy |
 | [`drake_talley_adk/portfolio_data.py`](drake_talley_adk/portfolio_data.py) | **Verified** track record vs **synthetic** vignettes (data only) |
 | [`ARCHITECTURE.md`](ARCHITECTURE.md) | Agent hierarchies, tool rules, production next steps |
 
@@ -109,6 +109,19 @@ Use **preset prompts** for one-click demos. The UI calls ADK **`POST /run`** (fu
 
 ---
 
+## Tests & CI
+
+Fast **pytest** on tool modules only—no Gemini API key required:
+
+```powershell
+pip install -r requirements.txt
+pytest
+```
+
+**GitHub Actions** (`.github/workflows/ci.yml`) runs the same suite on Python **3.10** and **3.12**.
+
+---
+
 ## Disclosure
 
 Synthetic vignettes in `case_studies` are **fictional** scenarios for **ADK** pattern demos. **RevOps** rows in `revenue_ops_data.py` and **Meridian BSA/AML** rows in `aml_alert_data.py` are **demo records** only. **Employment, clients, and quantitative claims** in `verified_track_record` are transcribed from Drake’s résumé for tool-grounded responses.
@@ -116,5 +129,3 @@ Synthetic vignettes in `case_studies` are **fictional** scenarios for **ADK** pa
 ADK **Web** is [development-only per Google](https://google.github.io/adk-docs/); production = Cloud Run, Vertex AI Agent Engine, or `adk api_server` patterns from ADK docs.
 
 ---
-
-**If you need someone who can talk to executives *and* ship agents on Vertex/Gemini: you’re in the right repo.**

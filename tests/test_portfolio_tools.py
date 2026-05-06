@@ -44,8 +44,8 @@ def test_interview_talking_points_invalid_theme() -> None:
     assert "allowed" in r
 
 
-def test_interview_hiring_manager_theme() -> None:
-    r = get_interview_talking_points("hiring_manager")
+def test_interview_technical_screen_theme() -> None:
+    r = get_interview_talking_points("technical_screen")
     assert r["status"] == "success"
-    assert r["theme"] == "hiring_manager"
+    assert r["theme"] == "technical_screen"
     assert len(r["points"]) >= 1

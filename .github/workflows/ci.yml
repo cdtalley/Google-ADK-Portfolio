@@ -24,5 +24,8 @@ jobs:
       - name: Install dependencies
         run: pip install -r requirements.txt
 
+      - name: Compile Python package
+        run: python -m compileall -q drake_talley_adk
+
       - name: Pytest
         run: pytest -q

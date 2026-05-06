@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useState } from "react";
 
 const APP_NAME = "drake_talley_adk";
-const USER_ID = "recruiter_ui";
+const USER_ID = "portfolio_ui";
 
 const PRESETS: { label: string; text: string }[] = [
   {
