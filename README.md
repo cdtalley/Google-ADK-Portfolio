@@ -1,69 +1,70 @@
-# Drake Talley — Google ADK Portfolio
+# Drake Talley — Google ADK Portfolio (GitHub)
 
-Interactive hiring artifact built with [Google Agent Development Kit (ADK)](https://google.github.io/adk-docs/): a tool-grounded portfolio agent with deliberate delegation between a technical specialist and an executive storyteller.
+Public portfolio for recruiters and hiring managers: a **live [Google Agent Development Kit (ADK)](https://google.github.io/adk-docs/)** app that showcases **agentic development**—multi-agent orchestration, function tools, and Gemini—applied across **synthetic, cross-industry scenarios**.
 
-## Why this exists
+## Disclosure: synthetic scenarios
 
-Recruiters and hiring managers can **chat with your portfolio** instead of scrolling another static PDF. The agent is instructed to **cite facts from code** (`portfolio_data.py`) rather than invent employers, dates, or metrics.
+The **case studies** in `drake_talley_adk/portfolio_data.py` use **fictional organizations and illustrative metrics**. They exist to demonstrate **repeatable ADK design patterns** (routing, tools, delegation, evaluation hooks), not to represent verifiable client engagements. Your real résumé and references stay the source of truth for employment history.
+
+## What this demonstrates (ADK expertise)
+
+| Theme | Where it shows up |
+|--------|-------------------|
+| **Multi-agent** | `root_agent` + `technical_proof` + `executive_voice` with LLM-driven transfer |
+| **Tool-grounded answers** | `portfolio_tools.py` — structured JSON from `portfolio_data.py` |
+| **Hiring-ready narrative** | Same facts, different specialist agents for technical vs exec tone |
+| **Cross-industry breadth** | Healthcare, fintech, retail, manufacturing, insurance, platform eval (all synthetic) |
+
+Drake positions as an engineer who can **ship and maintain ADK-based agents**, not only prototype chats.
 
 ## Quick start
 
-1. Python **3.10+** recommended (tested on 3.13).
+1. Python **3.10+** (tested on 3.13).
 
-2. Create a virtual environment (optional but recommended):
+2. Virtual environment (recommended):
 
    ```powershell
    python -m venv .venv
    .\.venv\Scripts\Activate.ps1
    ```
 
-3. Install dependencies:
+3. Install:
 
    ```powershell
    pip install -r requirements.txt
    ```
 
-4. Configure Gemini API access:
+4. API key: create one in [Google AI Studio](https://aistudio.google.com/app/apikey), then copy `env.example` to `.env` and set `GOOGLE_API_KEY`.
 
-   - Create a key in [Google AI Studio](https://aistudio.google.com/app/apikey).
-   - Copy `env.example` to `.env` in this folder and set `GOOGLE_API_KEY`.
-
-5. Run the ADK web UI from **this directory** (the parent of `drake_talley_adk/`):
+5. From **this directory** (parent of `drake_talley_adk/`):
 
    ```powershell
    adk web --port 8000
    ```
 
-   Open `http://localhost:8000`, select **`drake_talley_adk`**, and try prompts like:
+   Open `http://localhost:8000`, select **`drake_talley_adk`**.
 
-   - “Give me a two-minute pitch for a staff AI engineer loop.”
-   - “Walk me through your ADK architecture in this repo.”
-   - “Deep dive on evaluation strategy for agents.”
+   Example prompts:
 
-   CLI alternative:
+   - “What’s the data policy for the case studies?”
+   - “How does this repo use Google ADK multi-agent patterns?”
+   - “Walk me through the fintech compliance scenario and which ADK patterns it uses.”
 
-   ```powershell
-   adk run drake_talley_adk
-   ```
+   CLI: `adk run drake_talley_adk`
 
-## Customize your story
+## Customize for your profiles
 
-Edit **`drake_talley_adk/portfolio_data.py`**:
+Update **`drake_talley_adk/portfolio_data.py`** → `identity.profiles` (LinkedIn, GitHub). Keep or replace synthetic scenarios; add real projects in parallel sections if you want both.
 
-- Replace bracketed placeholders (`[Title]`, `[Quantified outcome — EDIT]`, links).
-- Keep claims truthful—the agent uses those strings as **authoritative** answers.
-
-Behavior and routing live in **`drake_talley_adk/agent.py`**. Tool surfaces are in **`portfolio_tools.py`**.
-
-## Project layout
+## Layout
 
 | Path | Role |
 |------|------|
-| `drake_talley_adk/agent.py` | `root_agent` + sub-agents (`technical_proof`, `executive_voice`) |
-| `drake_talley_adk/portfolio_data.py` | Editable facts and case studies |
-| `drake_talley_adk/portfolio_tools.py` | Tool functions the LLM calls for grounded answers |
-| `requirements.txt` | `google-adk` dependency |
+| `drake_talley_adk/agent.py` | ADK `Agent` graph: `root_agent`, sub-agents, tools |
+| `drake_talley_adk/portfolio_data.py` | Synthetic scenarios, ADK expertise copy, data policy |
+| `drake_talley_adk/portfolio_tools.py` | Function tools (includes `get_portfolio_context`, `get_adk_expertise`) |
+| `requirements.txt` | `google-adk` |
 
-## Note on ADK Web
+## ADK Web note
 
-Google documents ADK Web as **development-only**, not a production deployment surface. For real traffic, plan for Cloud Run, Vertex AI Agent Engine, or your own API host using `adk api_server` patterns from the ADK docs.
+Google documents **ADK Web** as **development-only**. For production, use paths in the ADK docs (e.g., Cloud Run, Vertex AI Agent Engine, `adk api_server`).

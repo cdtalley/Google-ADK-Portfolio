@@ -1,4 +1,4 @@
-"""Tools that ground the portfolio agent in editable facts (no hallucinated employers)."""
+"""Tools that ground the portfolio agent in structured data (synthetic scenarios + ADK story)."""
 
 from __future__ import annotations
 
@@ -7,12 +7,28 @@ from typing import Any
 from .portfolio_data import INVENTORY
 
 
+def get_portfolio_context() -> dict[str, Any]:
+    """Returns audience, data policy (synthetic scenarios), and what this repo demonstrates."""
+    return {"status": "success", "portfolio_context": INVENTORY["portfolio_context"]}
+
+
+def get_adk_expertise() -> dict[str, Any]:
+    """Returns Drake's stated Google ADK expertise: patterns, primitives, deployment notes."""
+    return {"status": "success", "adk_expertise": INVENTORY["adk_expertise"]}
+
+
 def list_case_study_slugs() -> dict[str, Any]:
-    """Lists available case study identifiers for `get_case_study_by_slug`."""
-    rows = [
-        {"slug": x["slug"], "title": x["title"]}
-        for x in INVENTORY.get("case_studies", [])
-    ]
+    """Lists synthetic case studies with industry labels for browsing."""
+    rows = []
+    for x in INVENTORY.get("case_studies", []):
+        rows.append(
+            {
+                "slug": x["slug"],
+                "title": x["title"],
+                "industry": x.get("industry"),
+                "synthetic": x.get("synthetic", True),
+            }
+        )
     return {"status": "success", "case_studies": rows}
 
 
@@ -22,17 +38,17 @@ def get_identity_card() -> dict[str, Any]:
 
 
 def get_capability_matrix() -> dict[str, Any]:
-    """Returns grouped technical and leadership capabilities."""
+    """Returns grouped capabilities (ADK, evaluation, engineering, ML)."""
     return {"status": "success", "capabilities": INVENTORY["capabilities"]}
 
 
 def get_repository_showcase() -> dict[str, Any]:
-    """Explains how THIS ADK repo is structured and what it proves about ADK skill."""
+    """Explains how THIS repo is structured and what it proves about ADK skill."""
     return {"status": "success", "repository": INVENTORY["this_repository"]}
 
 
 def get_case_study_by_slug(slug: str) -> dict[str, Any]:
-    """Fetches one case study by slug, including STAR-style narrative fields."""
+    """Fetches one synthetic case study by slug (industry scenario + ADK patterns used)."""
     for study in INVENTORY.get("case_studies", []):
         if study.get("slug") == slug:
             return {"status": "success", "case_study": study}
@@ -56,5 +72,5 @@ def get_interview_talking_points(theme: str) -> dict[str, Any]:
 
 
 def get_signature_positioning() -> dict[str, Any]:
-    """Returns the authorized 'bold' framing plus evidence hooks (still factual)."""
+    """Returns positioning lines plus evidence hooks tied to this repository."""
     return {"status": "success", "signature_claims": INVENTORY.get("signature_claims", [])}

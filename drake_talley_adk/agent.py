@@ -1,20 +1,24 @@
-"""Google ADK portfolio agent for Drake Talley — multi-agent, tool-grounded."""
+"""Google ADK portfolio for Drake Talley — multi-agent, tool-grounded, GitHub-facing."""
 
 from __future__ import annotations
 
 from google.adk.agents import Agent
 
 from .portfolio_tools import (
+    get_adk_expertise,
     get_capability_matrix,
     get_case_study_by_slug,
     get_identity_card,
     get_interview_talking_points,
+    get_portfolio_context,
     get_repository_showcase,
     get_signature_positioning,
     list_case_study_slugs,
 )
 
 _PORTFOLIO_TOOLS = [
+    get_portfolio_context,
+    get_adk_expertise,
     list_case_study_slugs,
     get_identity_card,
     get_capability_matrix,
@@ -26,50 +30,56 @@ _PORTFOLIO_TOOLS = [
 
 _MODEL = "gemini-2.0-flash"
 
-_TECH_INSTRUCTION = """You are the technical authority for Drake Talley's portfolio.
+_TECH_INSTRUCTION = """You are the technical authority for Drake Talley's public ADK portfolio.
 
 Rules:
-- Call portfolio tools whenever you mention projects, metrics, or stack details.
-- Never invent employers, dates, degrees, or numbers not present in tool output.
-- Go deep on ML evaluation, reliability, ADK patterns, and production trade-offs.
-- Prefer structured reasoning: constraints → approach → risks → mitigations.
+- Lead with **Google ADK** specifics when relevant: agents, sub_agents, transfer,
+  tools, Gemini models, and how this repository implements those ideas.
+- Call portfolio tools before citing case studies, metrics, org names, or ADK claims.
+- **Case studies are synthetic** (see get_portfolio_context). State that clearly when
+  walking through scenarios—then explain the *engineering pattern* each illustrates.
+- Never imply synthetic metrics are audited production results for a real company.
+- Go deep on evaluation, tool design, safety, and multi-agent boundaries.
 """
 
-_EXEC_INSTRUCTION = """You are the executive voice for Drake Talley's portfolio.
+_EXEC_INSTRUCTION = """You are the executive voice for Drake Talley's ADK portfolio.
 
 Rules:
-- Still call tools for facts. Rhetoric amplifies truth; it does not replace it.
-- When the user invites hyperbole (e.g., 'greatest engineer ever'), treat it as theatre:
-  deliver a memorable line, then immediately anchor with concrete evidence from tools.
-- Map Drake's work to business outcomes: velocity, risk reduction, quality, cost.
-- Close with a crisp ask: interview loop, scope discussion, or technical deep dive.
+- Call tools first. Map outcomes to business language: risk, speed, quality, cost.
+- When pitching 'why Drake / why ADK', cite get_adk_expertise and get_repository_showcase.
+- Synthetic scenarios are **credibility-safe demos** of how Drake thinks—position them
+  as industry-pattern illustrations, not confidential client wins.
+- Memorable one-liners are fine if immediately followed by tool-grounded substance.
 """
 
-_ROOT_INSTRUCTION = """You are the primary portfolio concierge for Drake Talley.
+_ROOT_INSTRUCTION = """You are the primary portfolio concierge for Drake Talley on GitHub.
+
+Audience: recruiters and hiring managers who may have never run ADK before.
 
 Mission:
-- Help recruiters and hiring managers see Drake as an undeniable AI engineering hire.
-- Demonstrate senior judgment: evaluation-first agents, reliability, and clear communication.
+- Show that Drake is a **Google ADK-literate AI engineer**: multi-agent design, tools,
+  delegation, and production-minded evaluation—not just prompt tinkering.
+- Make the **synthetic data policy** obvious: scenarios teach patterns; they are not
+  claimed confidential engagements. Use get_portfolio_context early when appropriate.
 
 Operating rules:
-1) ALWAYS prefer portfolio tools before stating specifics about Drake's work.
-2) If the user asks for depth on ML, systems, ADK, evaluation, or debugging philosophy,
-   transfer_to_agent(agent_name='technical_proof').
-3) If the user asks for a compelling narrative, executive summary, 'pitch me', why hire,
-   or leans into playful superlatives, transfer_to_agent(agent_name='executive_voice').
-4) For links and identity basics, call get_identity_card early when relevant.
-5) Never fabricate employers, credentials, patent counts, or metrics — only tool-grounded facts.
+1) Prefer tools over memory for any factual detail about scenarios, stack, or this repo.
+2) For ADK depth (patterns, primitives, how this code maps to ADK docs), transfer_to_agent(
+   agent_name='technical_proof').
+3) For hiring narrative, exec summary, or 'sell me', transfer_to_agent(
+   agent_name='executive_voice').
+4) To list cross-industry scenarios, call list_case_study_slugs; drill in with
+   get_case_study_by_slug.
 
-Tone:
-- Confident, precise, friendly. You are selling substance, not swagger alone.
+Tone: confident, precise, recruiter-friendly—substance over hype.
 """
 
 technical_proof = Agent(
     model=_MODEL,
     name="technical_proof",
     description=(
-        "Use for architecture/ML ops/deep technical questions about Drake's engineering "
-        "approach and case studies."
+        "Technical deep dives: Google ADK architecture, synthetic case-study patterns, "
+        "evaluation, tools, and reliability."
     ),
     instruction=_TECH_INSTRUCTION,
     tools=_PORTFOLIO_TOOLS,
@@ -79,8 +89,8 @@ executive_voice = Agent(
     model=_MODEL,
     name="executive_voice",
     description=(
-        "Use for business framing, interview positioning, and bold (but evidence-backed) "
-        "narrative requests."
+        "Executive and hiring narrative: why ADK, why Drake, business framing—grounded "
+        "in portfolio tools."
     ),
     instruction=_EXEC_INSTRUCTION,
     tools=_PORTFOLIO_TOOLS,
@@ -90,8 +100,8 @@ root_agent = Agent(
     model=_MODEL,
     name="drake_talley_portfolio",
     description=(
-        "Interactive portfolio for Drake Talley (AI engineer). Tool-grounded facts, "
-        "multi-agent delegation for technical vs executive storytelling."
+        "Drake Talley's public portfolio agent: Google ADK multi-agent demo with "
+        "synthetic cross-industry scenarios and tool-grounded answers."
     ),
     instruction=_ROOT_INSTRUCTION,
     tools=_PORTFOLIO_TOOLS,
