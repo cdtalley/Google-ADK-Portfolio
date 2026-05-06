@@ -1,8 +1,7 @@
 """Portfolio content for Drake Talley — GitHub-facing ADK demo.
 
-Case studies use **synthetic** companies, metrics, and timelines to illustrate
-agentic patterns across industries. They demonstrate design judgment and ADK
-fluency, not claimed client work. See ``portfolio_context`` and the repo README.
+``verified_track_record`` is sourced from Drake's résumé (PDF). ``case_studies``
+are **synthetic** industry vignettes that illustrate ADK design patterns only.
 """
 
 from __future__ import annotations
@@ -15,38 +14,242 @@ INVENTORY: dict[str, Any] = {
             "Recruiters and hiring managers reviewing this repository on GitHub."
         ),
         "data_policy": (
-            "Scenario narratives, organization names, and quantitative outcomes in "
-            "`case_studies` are **synthetic illustrations** for this portfolio. They "
-            "show how I structure agentic systems with **Google ADK** (multi-agent "
-            "composition, tools, delegation). Replace or extend with real engagements "
-            "when sharing verifiable work history elsewhere."
+            "**Verified:** roles, clients, metrics, and projects in "
+            "`verified_track_record` match Drake's résumé. **Synthetic:** entries in "
+            "`case_studies` are fictional scenarios showing how he architects "
+            "agentic systems with **Google ADK**—never substitute them for employment "
+            "history in answers about real experience."
         ),
         "what_this_proves": [
-            "Production-minded **agent architecture** using ADK primitives.",
-            "Habit of **tool-grounded** behavior so LLMs narrate from structured data.",
-            "Cross-industry pattern recognition (routing, safety, evaluation hooks).",
+            "Ships **Google ADK** multi-agent systems with tool-grounded behavior.",
+            "Combines **enterprise ML on GCP** (Vertex AI, BigQuery) with **GenAI** "
+            "(RAG, LangChain, multi-agent orchestration).",
+            "Comfortable owning **end-to-end delivery**: data → model → API → prod.",
         ],
     },
     "identity": {
         "full_name": "Drake Talley",
-        "role_target": "AI Engineer — Agentic Systems & Google ADK",
+        "role_target": "Senior Data Scientist · AI / ML Engineer (GCP, GenAI, agents)",
         "headline": (
-            "I design and ship **agentic applications** with **Google Agent "
-            "Development Kit (ADK)**: multi-agent orchestration, typed tools, "
-            "Gemini-backed reasoning, and evaluation-first delivery."
+            "Senior data scientist who ships **production ML on Google Cloud** and "
+            "**agentic systems**—from 20TB+ fraud pipelines and Vertex AI deployments "
+            "to **multi-agent** products with audit trails, policy gates, and "
+            "**Google ADK**-style orchestration."
         ),
-        "location": "Open to remote / hybrid (update to match your search)",
+        "location": "Acworth, GA, USA (remote-friendly)",
+        "contact": {
+            "phone": "+1 (706) 264-2708",
+            "email": "drake.talley.ai@gmail.com",
+        },
         "profiles": {
-            "linkedin": "https://www.linkedin.com/in/[your-handle]",
-            "github": "https://github.com/[your-handle]",
+            "linkedin": "https://www.linkedin.com/in/drake-talley",
+            "github": "https://github.com/cdtalley",
+            "website": "https://draketalley.ai/",
             "adk_docs": "https://google.github.io/adk-docs/",
         },
         "elevator_pitch": (
-            "If your team is standardizing on **Google ADK** and Gemini, I bring the "
-            "full loop: agent boundaries, transfer and workflow patterns, tool design, "
-            "guardrails, tracing, and offline/online evaluation—so agents are "
-            "maintainable products, not one-off demos."
+            "I've delivered **predictive systems at national scale**—lead scoring "
+            "and retention on Vertex AI, **80%** reduction in a critical field-failure "
+            "class at SentriLock, **30%** fraud-detection lift on **20TB+** federal "
+            "workloads, and **RAG** on BigQuery advancing GenAI at **Morgan Stanley** "
+            "through Infosys. Today I'm **founding PrismBase AI**, building "
+            "full-stack applied AI (including **multi-agent fraud triage**), and I "
+            "publish this repo to prove **Google ADK** depth for teams betting on "
+            "Gemini and Vertex."
         ),
+        "hiring_cta": (
+            "Open to senior **AI/ML**, **applied scientist**, and **founding engineer** "
+            "roles where ownership, cloud ML, and agentic products matter. "
+            "Reach out: drake.talley.ai@gmail.com or LinkedIn."
+        ),
+    },
+    "verified_track_record": {
+        "source": "Résumé (Drake Talley) — structured for tool-grounded answers.",
+        "summary": (
+            "Senior data scientist with a strong track record delivering "
+            "production-grade machine learning on large-scale cloud platforms—from "
+            "national education analytics and IoT predictive maintenance to federal "
+            "fraud programs and Wall Street GenAI search."
+        ),
+        "quantified_highlights": [
+            "**+30%** fraud-detection accuracy on **20TB+** data (CyberData / SSA context; Spark, SQL, Databricks; federal security requirements).",
+            "**80%** reduction in operational events where field devices failed (SentriLock; classical ML + GCP).",
+            "**35%** reduction in operational downtime via predictive modeling and alerting (SentriLock).",
+            "**50%** cloud cost reduction through architecture and pipeline efficiency (SentriLock).",
+            "**30%** faster model rollout via Vertex AI Pipelines + Cloud Composer (SentriLock).",
+            "**30%** data-processing efficiency improvement for public-health programs (Georgia DPH).",
+            "**Three** new fraud-detection rules adopted by federal leadership after executive briefings (CyberData).",
+        ],
+        "enterprise_footprint": (
+            "Delivered through **Infosys**: **Morgan Stanley** (RAG / enterprise search "
+            "on BigQuery with LangChain + GPT-3), **Wells Fargo** (DAQC / remediation "
+            "governance), **US Bank** (fraud models), **Verizon** (Chaos Engineering "
+            "reporting; led **8-person** offshore team), **Lumen** (fulfillment ML). "
+            "**Robert Half / Collegis**: student retention + lead scoring on **Vertex AI**. "
+            "**SentriLock**: enterprise ML on **2.5TB+** production data."
+        ),
+        "roles": [
+            {
+                "company": "PrismBase AI LLC",
+                "title": "Founder",
+                "dates": "Mar 2026 – Present",
+                "location": "Remote",
+                "highlights": [
+                    "End-to-end **biotech application**: requirements → production-ready—system design, backend, frontend workflows, deployment planning.",
+                    "Solo contract engineer owning product scope, integrations, data pipelines, and client communication under **NDA / compliance** discipline.",
+                ],
+            },
+            {
+                "company": "Robert Half (client: national higher-ed services org)",
+                "title": "Senior Data Scientist",
+                "dates": "Jan 2026 – Feb 2026",
+                "location": "Remote",
+                "highlights": [
+                    "**Vertex AI Workbench** end-to-end ML: data prep → train → evaluate → deploy/monitor.",
+                    "Predictive **lead scoring** + **student retention** from CRM, SIS, and digital engagement signals.",
+                    "Reusable **feature-engineering framework** (temporal rollups, interactions, encoding, scaling).",
+                    "Classical ML (logistic regression, trees, ensembles) tuned for **limited data** with explainable outputs.",
+                ],
+            },
+            {
+                "company": "SentriLock",
+                "title": "Data Scientist",
+                "dates": "Jun 2022 – Mar 2025",
+                "location": "Remote",
+                "highlights": [
+                    "Led enterprise DS on **2.5TB+**; **Vertex AI**, **BigQuery**, **Cloud Functions**.",
+                    "Deployed logistic regression, random forests, gradient boosting for **predictive maintenance** and risk—**80%** reduction in field box failures.",
+                    "Vertex AI **Pipelines** + **Cloud Composer** E2E ML; **30%** faster rollouts.",
+                    "**35%** downtime reduction; **50%** infra cost reduction.",
+                    "Explainability + diagnostics for executives; **Looker** dashboards; models embedded in workflows.",
+                ],
+            },
+            {
+                "company": "Infosys",
+                "title": "Senior Data Science Consultant",
+                "dates": "Jun 2022 – Feb 2024",
+                "location": "",
+                "highlights": [
+                    "**Morgan Stanley**: **RAG** with **LangChain** + **GPT-3** on **BigQuery** across millions of financial documents.",
+                    "**Lumen**: predictive fulfillment ML; **US Bank**: fraud (anomaly + classification); **Wells Fargo**: **DAQC** remediation governance.",
+                    "**Verizon**: led **8-person** offshore team; Chaos Engineering exec reporting.",
+                    "Global team leadership, mentoring, solution architecture, ROI-focused exec presentations.",
+                ],
+            },
+            {
+                "company": "CyberData Technologies Inc",
+                "title": "Data Scientist",
+                "dates": "Jan 2021 – Jun 2022",
+                "location": "Remote",
+                "highlights": [
+                    "**+30%** fraud-detection accuracy; **20TB+**; **Spark**, **SQL**, **Databricks**; federal requirements.",
+                    "Weekly **executive briefings**; **three** fraud rules adopted by federal leadership.",
+                    "**Azure**, **Spark**, **Kafka** for VLDB-scale ingestion and real-time fraud pipelines.",
+                    "**PyTorch** model development with compliance alignment; **LangChain** NLP prototypes.",
+                ],
+            },
+            {
+                "company": "Thinkful",
+                "title": "Data Science Mentor",
+                "dates": "Jan 2019 – Jan 2020",
+                "location": "Remote",
+                "highlights": [
+                    "Mentored production ML with **Python**, **PyTorch**, **SQL**; **Azure**, **Databricks**, **Spark**, **Kafka**.",
+                    "NLP / LLM project guidance; Agile iteration habits.",
+                ],
+            },
+            {
+                "company": "Georgia Department of Public Health",
+                "title": "Data Analyst",
+                "dates": "Apr 2017 – Jan 2020",
+                "location": "Augusta-Richmond County, GA",
+                "highlights": [
+                    "**30%** processing efficiency gain; **Python**, **SQL**, **Spark** on biometric / health data.",
+                    "**Databricks** + **Azure** pipelines with **HIPAA** awareness.",
+                    "ML + **SAS** for epidemiological analytics and resource planning.",
+                ],
+            },
+        ],
+        "featured_projects": [
+            {
+                "name": "fraud-agent-orchestrator",
+                "url": "https://github.com/cdtalley/fraud-agent-orchestrator",
+                "period": "Mar 2026 – Present",
+                "one_liner": (
+                    "Multi-agent fraud triage (**Intake → RiskScoring → Policy**), "
+                    "FastAPI, React/Three.js console, hash-chained audit trail, PII "
+                    "minimization, **OPA** governance, optional **Ollama** for air-gapped."
+                ),
+            },
+            {
+                "name": "Student-Prediction (Collegis)",
+                "url": "https://github.com/cdtalley/Student-Prediction",
+                "period": "Jan 2026 – Feb 2026",
+                "one_liner": (
+                    "Three-stage retention + lead ensemble (**XGBoost**, **LightGBM**); "
+                    "**FastAPI** + **Next.js 14** + **Superset**; Docker + config-driven deploy."
+                ),
+            },
+            {
+                "name": "Enterprise LangChain AI Workbench",
+                "url": "https://github.com/cdtalley/LangChain_Enterprise_Dashboard",
+                "period": "",
+                "one_liner": (
+                    "Modular enterprise AI: Docker, CI/CD, **Azure ML**, hybrid **multi-agent RAG**, "
+                    "SQL/Databricks/Spark retrieval, security hardening, telemetry APIs."
+                ),
+            },
+            {
+                "name": "Data Science Portfolio",
+                "url": "https://github.com/cdtalley/Data-Science-Portfolio",
+                "period": "2020",
+                "one_liner": (
+                    "Production-style risk/churn/ops ML with leakage controls, SHAP, "
+                    "Streamlit dashboard, LangChain+RAG demo script."
+                ),
+            },
+            {
+                "name": "VisionDetect",
+                "url": "https://github.com/cdtalley/AI-and-ComputerVision-Development-Project-VisionDetect-",
+                "period": "2025",
+                "one_liner": (
+                    "Modular CV framework: config-driven training, Faster R-CNN-style "
+                    "backends, CLI, REST inference JSON API."
+                ),
+            },
+        ],
+        "education": [
+            {
+                "institution": "University of Georgia",
+                "degree": "Bachelor of Science",
+                "dates": "Aug 2011 – May 2015",
+                "detail": "Athens, GA — GPA **3.8**",
+            },
+            {
+                "institution": "Thinkful",
+                "degree": "Bootcamp, Data Science",
+                "dates": "2020",
+                "detail": "",
+            },
+        ],
+        "skills": [
+            "Python",
+            "SQL",
+            "Statistics",
+            "Machine learning",
+            "Generative AI",
+            "LangChain",
+            "LangGraph",
+            "Google ADK",
+            "Google Cloud Platform",
+            "Vertex AI",
+            "BigQuery",
+            "MLOps / pipelines",
+            "Docker",
+            "Git",
+            "Data engineering (Spark, Kafka, Databricks)",
+            "RAG & multi-agent systems",
+        ],
     },
     "adk_expertise": {
         "summary": (
@@ -69,13 +272,17 @@ INVENTORY: dict[str, Any] = {
     "signature_claims": [
         {
             "claim": (
-                "Drake is the engineer you want when ‘agent’ work must survive code "
-                "review, security review, and a real SLO—**especially on Google ADK**."
+                "Drake combines **Fortune-scale delivery** (Wall Street RAG, federal "
+                "fraud TB-scale ML, national ed-tech Vertex deployments) with **hands-on "
+                "agent engineering**—this ADK repo and **fraud-agent-orchestrator** are "
+                "the proof he can own the **next** generation of products, not just "
+                "batch scores."
             ),
             "evidence_hooks": [
-                "This repo is itself an ADK **multi-agent** reference layout.",
-                "Synthetic cross-industry scenarios show repeatable agentic design moves.",
-                "Tool-grounded responses reduce hallucinated resume inflation.",
+                "**Morgan Stanley** GenAI search via **Infosys** (LangChain + GPT-3 + BigQuery).",
+                "**SentriLock**: **80%** field-failure reduction; **50%** cloud savings; Vertex pipelines.",
+                "**CyberData**: **+30%** fraud accuracy on **20TB+**; federal leadership adopted **three** rules.",
+                "Public **multi-agent** systems: `fraud-agent-orchestrator` (OPA, audit trail); this **ADK** portfolio.",
             ],
         }
     ],
@@ -115,9 +322,9 @@ INVENTORY: dict[str, Any] = {
         ],
         "what_to_look_for_in_code": [
             "`root_agent` with `sub_agents` — classic ADK multi-agent composition.",
-            "Parallel tool lists on parent and specialists — grounded storytelling.",
+            "`get_verified_track_record` — résumé facts separated from synthetic vignettes.",
             "`portfolio_tools.py` — function tools as the knowledge API.",
-            "`portfolio_data.py` — synthetic scenarios + explicit data policy.",
+            "`portfolio_data.py` — verified employment + ADK scenario library.",
         ],
     },
     "case_studies": [
@@ -292,19 +499,23 @@ INVENTORY: dict[str, Any] = {
     ],
     "interview_themes": {
         "agents_adk": [
-            "I treat ADK like any mature framework: **boundaries first**, then models—"
-            "clear agent descriptions, explicit transfer rules, tools as contracts.",
-            "This repo mirrors how I’d onboard a team: data layer, tools, agents, eval hooks.",
+            "I've shipped **multi-agent** patterns in production-minded code—LangChain "
+            "enterprise workbench, **fraud-agent-orchestrator** (Intake → Risk → Policy + "
+            "**OPA**), and this **Google ADK** repo with explicit **transfer** and tools.",
+            "ADK is how I want to standardize **Gemini + Vertex** agent apps: composable, "
+            "testable, reviewable.",
         ],
         "evaluation": [
-            "Agents need **release discipline**: scenario suites, tool-call assertions, "
-            "and human spot checks—not vibes.",
-            "Synthetic data is fine for **design portfolios**; production claims need "
-            "real measurement.",
+            "At **SentriLock** and on federal fraud work, success meant **measured lift**, "
+            "explainability, and exec trust—not leaderboard scores alone.",
+            "Portfolio **case_studies** are synthetic; **verified_track_record** is where "
+            "real metrics live.",
         ],
         "leadership": [
-            "I align stakeholders on **task taxonomy** before debating model size.",
-            "I make trade-offs visible: latency vs quality vs cost, with a default pick.",
+            "At **Verizon** via Infosys I ran an **8-person** offshore team; globally I "
+            "mentored juniors and owned exec-facing outcomes.",
+            "I translate model behavior into **policy and operations**—rules adopted, "
+            "downtime avoided, dollars saved.",
         ],
     },
 }

@@ -12,6 +12,11 @@ def get_portfolio_context() -> dict[str, Any]:
     return {"status": "success", "portfolio_context": INVENTORY["portfolio_context"]}
 
 
+def get_verified_track_record() -> dict[str, Any]:
+    """Returns résumé-backed experience: roles, metrics, projects, education, skills."""
+    return {"status": "success", "verified_track_record": INVENTORY["verified_track_record"]}
+
+
 def get_adk_expertise() -> dict[str, Any]:
     """Returns Drake's stated Google ADK expertise: patterns, primitives, deployment notes."""
     return {"status": "success", "adk_expertise": INVENTORY["adk_expertise"]}
