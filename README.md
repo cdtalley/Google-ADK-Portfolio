@@ -62,7 +62,12 @@ npm install
 npm run dev
 ```
 
-Open **`http://localhost:5173`**. The UI proxies API calls to the ADK server. Use **preset prompts** for one-click demos, or type your own. The **Trace** panel shows **function calls**, **responses**, and **agent** authors as SSE events arrive.
+Open **`http://localhost:5173`** (use **`npm run dev`** — do not open `file://` or a static build without the proxy). The dev server **proxies** `/run_sse` and `/apps` to ADK and **strips the `Origin` header** so you avoid ADK’s `403 Forbidden: origin not allowed` on POST.
+
+Use **preset prompts** for one-click demos. The **Trace** panel fills **in real time** as each tool runs and each sub-agent speaks (SSE from `adk api_server`).
+
+**If you still see “origin not allowed”:** restart Vite after `git pull`, or run ADK with explicit CORS:  
+`adk api_server --port 8000 --allow_origins http://localhost:5173 --allow_origins http://127.0.0.1:5173`
 
 ### 5-minute reviewer path
 

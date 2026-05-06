@@ -109,6 +109,7 @@ async function parseSseStream(
     const { done, value } = await reader.read();
     if (done) break;
     buf += dec.decode(value, { stream: true });
+    buf = buf.replace(/\r\n/g, "\n");
     let idx: number;
     while ((idx = buf.indexOf("\n\n")) >= 0) {
       const chunk = buf.slice(0, idx);
@@ -156,7 +157,7 @@ export default function App() {
   const [messages, setMessages] = useState<ChatMsg[]>([
     {
       role: "assistant",
-      text: "Select a **preset** or type below. Requires **`adk api_server`** on port **8000** (see repo README). Session is synthetic demo data only.",
+      text: "Select a **preset** (Meridian AML, RevOps, …). **Live:** watch the **Trace** panel stream each **tool call** and **agent** (`author`) as Gemini runs—multi-agent work, not a canned script. Requires **`adk api_server --port 8000`** and this UI via **`npm run dev`** on port **5173** (proxy fixes ADK origin checks).",
     },
   ]);
   const [input, setInput] = useState("");
@@ -273,7 +274,13 @@ export default function App() {
             Drake Talley — Google ADK portfolio
           </div>
           <div style={{ fontSize: "0.8rem", color: "#8b9bab", marginTop: 4 }}>
-            Live SSE trace · session <code style={{ color: "#80cbc4" }}>{sessionId}</code>
+            {busy ? (
+              <span style={{ color: "#4dd0e1" }}>Running agent — trace updating…</span>
+            ) : (
+              <>
+                Live SSE · session <code style={{ color: "#80cbc4" }}>{sessionId}</code>
+              </>
+            )}
           </div>
         </header>
 
@@ -381,7 +388,7 @@ export default function App() {
             fontSize: "0.9rem",
           }}
         >
-          Trace · tools & agents
+          Trace · real-time tools & agents
         </div>
         <div style={{ fontSize: "0.72rem", padding: "8px 14px", color: "#78909c" }}>
           <strong>Agents:</strong> drake_talley_portfolio → technical_proof | executive_voice |
