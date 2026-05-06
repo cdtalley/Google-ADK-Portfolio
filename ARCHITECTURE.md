@@ -28,6 +28,16 @@ Same **Google ADK** pattern: coordinator `Agent` with **`sub_agents`** and LLM-d
 
 [`recruiter_demo/`](recruiter_demo/) uses **Vite** with **proxy** to `http://127.0.0.1:8000` for ADK **`/run`**, **`/apps/**`, **`/list-apps`**. Chat plus **trace** replay (function calls, responses, `author`). ADK Web remains fine for quick debugging. See [ADK API server](https://google.github.io/adk-docs/runtime/api-server/).
 
-## Production-oriented next steps (not implemented here)
+## Beyond this repo (what a full deployment adds)
 
-Offline **eval** suites, **tracing** to observability backends, **secrets** via Secret Manager, deploy **Cloud Run** / **Vertex AI Agent Engine** per [ADK docs](https://google.github.io/adk-docs/).
+This codebase stops at **runnable local + container + CI**. A production deployment typically layers on:
+
+| Concern | This repo | Typical next step |
+|---------|-----------|-------------------|
+| **Secrets** | `.env` / env vars only | Secret Manager, workload identity, no keys in images |
+| **Observability** | ADK default logging | OpenTelemetry export, trace IDs per session, tool latency metrics |
+| **Evaluation** | `pytest` on deterministic tools | Task suites + LLM-as-judge rubrics + regression on golden sessions |
+| **Scaling** | Single `api_server` process | Cloud Run / GKE / Vertex AI Agent Engine per [ADK deploy docs](https://google.github.io/adk-docs/deploy/) |
+| **Auth** | Open local server | OAuth / API keys on edge, per-tenant session isolation |
+
+**Container:** `Dockerfile` at repo root runs `adk api_server` on port **8000**; pass **`GOOGLE_API_KEY`** (or equivalent) at `docker run`. The web UI still runs separately (`recruiter_demo`) or use ADK Web against the same port.

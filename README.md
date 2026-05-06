@@ -109,16 +109,31 @@ Use **preset prompts** for one-click demos. The UI calls ADK **`POST /run`** (fu
 
 ---
 
+## Docker (API server only)
+
+From repo root:
+
+```powershell
+docker build -t adk-portfolio .
+docker run --rm -p 8000:8000 -e GOOGLE_API_KEY="your-key" adk-portfolio
+```
+
+Then open ADK docs UI against `http://localhost:8000` or run `recruiter_demo` with the Vite proxy pointed at that host.
+
+---
+
 ## Tests & CI
 
-Fast **pytest** on tool modules only—no Gemini API key required:
+**pytest** covers deterministic tools and **agent graph wiring** (sub-agent names, tool-list subsets)—**no Gemini calls**.
 
 ```powershell
 pip install -r requirements.txt
+pip install ruff   # optional local lint
+ruff check drake_talley_adk tests
 pytest
 ```
 
-**GitHub Actions** (`.github/workflows/ci.yml`) runs the same suite on Python **3.10** and **3.12**.
+**GitHub Actions** runs **Ruff**, **`compileall`**, and **pytest** on Python **3.10** and **3.12**. **Dependabot** watches pip, npm (`recruiter_demo`), and Actions.
 
 ---
 

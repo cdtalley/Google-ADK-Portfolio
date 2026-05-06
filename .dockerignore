@@ -1,0 +1,15 @@
+.git
+.github
+.venv
+venv
+__pycache__
+*.pyc
+.pytest_cache
+.env
+.adk
+node_modules
+recruiter_demo/node_modules
+recruiter_demo/dist
+*.egg-info
+dist
+build

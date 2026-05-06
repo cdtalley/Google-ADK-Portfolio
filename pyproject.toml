@@ -1,0 +1,14 @@
+[project]
+name = "drake-talley-adk-portfolio"
+version = "0.1.0"
+description = "Google ADK multi-agent portfolio (Python package: drake_talley_adk)"
+readme = "README.md"
+requires-python = ">=3.10"
+
+[tool.ruff]
+target-version = "py310"
+line-length = 100
+src = ["drake_talley_adk", "tests"]
+
+[tool.ruff.lint]
+select = ["E4", "E7", "E9", "F", "I", "W"]

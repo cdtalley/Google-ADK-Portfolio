@@ -2,8 +2,6 @@
 
 from __future__ import annotations
 
-import pytest
-
 from drake_talley_adk.portfolio_tools import (
     get_case_study_by_slug,
     get_interview_talking_points,

@@ -5,7 +5,6 @@ from __future__ import annotations
 from google.adk.agents import Agent
 
 from .aml_alert_agents import aml_alert_orchestrator
-from .revenue_ops_agents import revops_lead_orchestrator
 from .portfolio_tools import (
     get_adk_expertise,
     get_capability_matrix,
@@ -18,6 +17,7 @@ from .portfolio_tools import (
     get_verified_track_record,
     list_case_study_slugs,
 )
+from .revenue_ops_agents import revops_lead_orchestrator
 
 _PORTFOLIO_TOOLS = [
     get_portfolio_context,
