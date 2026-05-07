@@ -18,3 +18,122 @@ body {
 #root {
   min-height: 100vh;
 }
+
+/* App shell: chat + trace */
+.portfolio-shell {
+  display: grid;
+  grid-template-columns: 1fr min(440px, 38vw);
+  gap: 0;
+  min-height: 100vh;
+}
+
+.portfolio-chat {
+  border-right: 1px solid #263238;
+  display: flex;
+  flex-direction: column;
+  background: #121a21;
+  min-height: 0;
+}
+
+.portfolio-trace {
+  background: #0d1117;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  min-height: 0;
+}
+
+@media (max-width: 960px) {
+  .portfolio-shell {
+    grid-template-columns: 1fr;
+    grid-template-rows: minmax(0, 1fr) auto;
+  }
+
+  .portfolio-chat {
+    border-right: none;
+    min-height: 52vh;
+  }
+
+  .portfolio-trace {
+    border-top: 1px solid #263238;
+    max-height: 48vh;
+  }
+}
+
+.msg-code {
+  font-family: ui-monospace, "Cascadia Code", monospace;
+  font-size: 0.88em;
+  background: rgba(0, 0, 0, 0.35);
+  padding: 0.1em 0.35em;
+  border-radius: 4px;
+  color: #80cbc4;
+}
+
+.trace-stats {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 14px;
+  padding: 10px 14px;
+  font-size: 0.72rem;
+  color: #b0bec5;
+  background: #0d1318;
+  border-bottom: 1px solid #263238;
+}
+
+.trace-stat-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 10px;
+  border-radius: 999px;
+  background: #1c2832;
+  border: 1px solid #37474f;
+}
+
+.trace-stat-pill strong {
+  color: #4dd0e1;
+  font-weight: 600;
+}
+
+.trace-row {
+  margin-bottom: 8px;
+  border: 1px solid #263238;
+  border-radius: 8px;
+  background: #161b22;
+}
+
+.trace-row-index {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 1.5rem;
+  height: 1.5rem;
+  margin-right: 8px;
+  border-radius: 4px;
+  font-size: 0.65rem;
+  font-weight: 700;
+  background: #263238;
+  color: #90a4ae;
+}
+
+.preset-btn {
+  font-size: 0.75rem;
+  padding: 8px 12px;
+  border-radius: 6px;
+  border: 1px solid #37474f;
+  background: #1c2832;
+  color: #eceff1;
+  cursor: pointer;
+  font-weight: 500;
+}
+
+.preset-btn:hover:not(:disabled) {
+  background: #263d4f;
+  border-color: #546e7a;
+}
+
+.preset-btn:disabled {
+  background: #263238;
+  cursor: wait;
+  opacity: 0.85;
+}

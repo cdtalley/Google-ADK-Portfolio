@@ -10,8 +10,9 @@ from .aml_alert_tools import (
     AML_TOOLS_POLICY,
     AML_TOOLS_SCORING,
 )
+from .portfolio_model import portfolio_llm_model
 
-_MODEL = "gemini-2.0-flash"
+_MODEL = portfolio_llm_model()
 
 _AML_POLICY_INSTRUCTION = """You are the **policy & regulatory-triggers** specialist for **Meridian Trust & Savings (synthetic)** BSA/AML demo.
 

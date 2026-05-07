@@ -1,4 +1,5 @@
-# Runnable ADK api_server (Gemini key required at runtime).
+# Runnable ADK api_server. Pass GOOGLE_API_KEY for Gemini, or PORTFOLIO_ADK_MODEL
+# for another backend (e.g. Ollama reachable from the container).
 # Build from repo root: docker build -t adk-portfolio .
 FROM python:3.12-slim-bookworm
 

@@ -29,6 +29,7 @@ Not a slideshow—a **runnable agent app**:
 - **RevOps lead triage** subsystem (`revops_lead_orchestrator`): addresses a **real** operating problem—**prioritizing finite sales capacity on policy-safe, high-intent inbound leads**—using **function tools** over a **synthetic** CRM (`revenue_ops_data.py`). Specialists: **policy / scoring / next-best-action**.
 - **Meridian BSA/AML alert triage** (`aml_alert_orchestrator`): **Meridian Trust & Savings (synthetic)**—**real-class** financial-crime ops problem (**analyst throughput**, **escalation**, **auditable reasons**) over **synthetic** alerts (`aml_alert_data.py`). Specialists: **policy / risk severity / disposition** with partitioned `AML_TOOLS_*`.
 - **Web UI** (`recruiter_demo/`): **Vite + React** chat plus **trace replay** of tool calls and agent authors against `adk api_server` (`POST /run`).
+- **No Google bill required to try it:** when **`GOOGLE_API_KEY` is missing or still a placeholder** (e.g. `YOUR_..._HERE`), agents use **`ollama/llama3.2:latest`** via ADK’s **LiteLLM** integration (`drake_talley_adk/portfolio_model.py`). Install [Ollama](https://ollama.com/), `ollama pull llama3.2`, keep **`ollama serve`** running. A **real** long key selects **`gemini-2.0-flash`**.
 - **Tool-grounded** answers: résumé facts live in `portfolio_data.py` → exposed via `portfolio_tools.py` so the model **quotes your real wins**, not hallucinated ones.
 - **Synthetic case studies** (healthcare, fintech, retail, etc.) are **deliberate ADK design exercises**—clearly separated from **verified** employment data.
 
@@ -38,7 +39,18 @@ Not a slideshow—a **runnable agent app**:
 python -m venv .venv
 .\.venv\Scripts\Activate.ps1
 pip install -r requirements.txt
-# Copy env.example → .env and set GOOGLE_API_KEY (https://aistudio.google.com/app/apikey)
+```
+
+**LLM backend (pick one):**
+
+| Mode | What to do |
+|------|------------|
+| **Local / no Google API** | Install [Ollama](https://ollama.com/), run `ollama pull llama3.2`, keep **`ollama serve`** running. **Delete** `GOOGLE_API_KEY` from `.env` or leave only a placeholder — fake/short keys are ignored so routing stays on **`ollama/llama3.2:latest`**. |
+| **Gemini API** | Copy **`env.example`** → **`.env`** and set **`GOOGLE_API_KEY`** ([AI Studio](https://aistudio.google.com/app/apikey)). Agents use **`gemini-2.0-flash`**. |
+
+Override anytime: **`PORTFOLIO_ADK_MODEL`** (see `env.example` and `drake_talley_adk/portfolio_model.py`).
+
+```powershell
 adk web --port 8000
 ```
 
@@ -50,7 +62,7 @@ Terminal **A** — from this repo root (folder that contains `drake_talley_adk/`
 
 ```powershell
 .\.venv\Scripts\Activate.ps1
-# GOOGLE_API_KEY in environment or .env per ADK docs
+# Optional: GOOGLE_API_KEY in .env for Gemini; omit for local Ollama (see table above)
 adk api_server --port 8000
 ```
 
@@ -69,9 +81,11 @@ Use **preset prompts** for one-click demos. The UI calls ADK **`POST /run`** (fu
 **If you still see “origin not allowed”:** restart Vite after `git pull`, or run ADK with explicit CORS:  
 `adk api_server --port 8000 --allow_origins http://localhost:5173 --allow_origins http://127.0.0.1:5173`
 
+**If the UI shows HTTP 500 / “Internal Server Error”:** check the **`adk api_server`** traceback. **Ollama:** `ollama serve` running, `ollama pull llama3.2` done, and **no leftover `GOOGLE_API_KEY`** that looks like a real key (or set **`PORTFOLIO_ADK_MODEL=ollama/llama3.2:latest`** to force local). **Windows:** the app sets **`OLLAMA_API_BASE=http://127.0.0.1:11434`** when using Ollama (avoids `localhost` → IPv6 issues). **Gemini:** valid key and quota. **General:** run from repo root; `pip install -r requirements.txt`. Debug: `adk api_server --port 8000 --log-level debug`.
+
 ### Quick demo prompts
 
-**Google ADK in one line:** An `Agent` combines a Gemini model, **instructions**, **function tools** (Python callables returning structured data), and optional **`sub_agents`**. Delegation is **`transfer_to_agent`**: the model chooses when to hand off to a specialist instead of hard-coding orchestration in application code.
+**Google ADK in one line:** An `Agent` combines an **LLM** (Gemini API or local via LiteLLM), **instructions**, **function tools** (Python callables returning structured data), and optional **`sub_agents`**. Delegation is **`transfer_to_agent`**: the model chooses when to hand off to a specialist instead of hard-coding orchestration in application code.
 
 **Copy-paste prompts** (each proves a different capability):
 
@@ -85,6 +99,7 @@ Use **preset prompts** for one-click demos. The UI calls ADK **`POST /run`** (fu
 | File | What it shows |
 |------|----------------|
 | [`drake_talley_adk/agent.py`](drake_talley_adk/agent.py) | `root_agent`, portfolio specialists, `sub_agents`, shared portfolio tools |
+| [`drake_talley_adk/portfolio_model.py`](drake_talley_adk/portfolio_model.py) | Gemini vs Ollama model selection (`GOOGLE_API_KEY` / `PORTFOLIO_ADK_MODEL`) |
 | [`drake_talley_adk/revenue_ops_agents.py`](drake_talley_adk/revenue_ops_agents.py) | RevOps orchestrator + policy / scoring / action subgraph |
 | [`drake_talley_adk/portfolio_tools.py`](drake_talley_adk/portfolio_tools.py) | Tool API over résumé + case-study data |
 | [`drake_talley_adk/revenue_ops_tools.py`](drake_talley_adk/revenue_ops_tools.py) | Deterministic CRM tools; partitioned tool lists per specialist |

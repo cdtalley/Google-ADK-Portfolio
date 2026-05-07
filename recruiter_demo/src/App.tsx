@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
 const APP_NAME = "drake_talley_adk";
 const USER_ID = "portfolio_ui";
@@ -24,17 +24,72 @@ const PRESETS: { label: string; text: string }[] = [
     label: "ADK architecture",
     text: "Transfer to technical_proof: explain how this repo uses sub_agents, transfer_to_agent, and partitioned tools—cite file names.",
   },
+  {
+    label: "Root → executive voice",
+    text: "Ask the root agent to transfer_to_agent to executive_voice and give a tight 4-bullet summary of Drake's ADK + production ML positioning using portfolio tools for facts only.",
+  },
 ];
 
 type ChatMsg = { role: "user" | "assistant"; text: string };
 
+type TraceKind = "call" | "transfer" | "result" | "text" | "meta" | "error";
+
 type TraceItem = {
   id: string;
   author?: string;
-  kind: "call" | "result" | "text" | "meta" | "error";
+  kind: TraceKind;
   title: string;
   body?: string;
 };
+
+function runStatsFromTrace(items: TraceItem[]) {
+  const authors = new Set<string>();
+  for (const t of items) {
+    if (t.author) authors.add(t.author);
+  }
+  const toolCalls = items.filter((t) => t.kind === "call").length;
+  const handoffs = items.filter((t) => t.kind === "transfer").length;
+  const toolResults = items.filter((t) => t.kind === "result").length;
+  const modelChunks = items.filter((t) => t.kind === "text").length;
+  return {
+    steps: items.length,
+    toolCalls,
+    handoffs,
+    toolResults,
+    modelChunks,
+    agents: [...authors].sort(),
+  };
+}
+
+/** FastAPI often returns `{ "detail": "..." }` or a list of validation errors; plain 500s may be empty. */
+async function readAdkHttpError(res: Response): Promise<string> {
+  const raw = (await res.text()).trim();
+  if (!raw) {
+    return `${res.status} ${res.statusText || "Error"}`.trim();
+  }
+  try {
+    const j = JSON.parse(raw) as { detail?: unknown };
+    if (typeof j.detail === "string") {
+      return j.detail;
+    }
+    if (Array.isArray(j.detail)) {
+      return j.detail
+        .map((item) => {
+          if (item && typeof item === "object" && "msg" in item) {
+            return String((item as { msg: unknown }).msg);
+          }
+          return JSON.stringify(item);
+        })
+        .join("; ");
+    }
+    if (j.detail != null) {
+      return String(j.detail);
+    }
+  } catch {
+    /* not JSON */
+  }
+  return raw;
+}
 
 /** ADK serializes with camelCase; tolerate snake_case from older payloads. */
 function getPartField(part: Record<string, unknown>, camel: string, snake: string): unknown {
@@ -66,11 +121,12 @@ function summarizeEvent(ev: Record<string, unknown>): TraceItem[] {
     if (fc && typeof fc === "object") {
       const name = String(fc.name ?? "?");
       const args = fc.args;
+      const isHandoff = name === "transfer_to_agent" || name === "transferToAgent";
       out.push({
         id: `${id}-call-${name}-${out.length}`,
         author,
-        kind: "call",
-        title: `Tool call: ${name}`,
+        kind: isHandoff ? "transfer" : "call",
+        title: isHandoff ? `Agent handoff: ${name}` : `Tool call: ${name}`,
         body: JSON.stringify(args ?? {}, null, 2),
       });
     }
@@ -125,26 +181,76 @@ function collectAssistantText(items: TraceItem[]): string {
 
 const delay = (ms: number) => new Promise((r) => setTimeout(r, ms));
 
-const shell: React.CSSProperties = {
-  display: "grid",
-  gridTemplateColumns: "1fr min(420px, 38vw)",
-  gap: 0,
-  minHeight: "100vh",
-};
+/** Minimal inline **bold** and `code` — no HTML from model is interpreted as tags. */
+function FormattedMessage({ text }: { text: string }) {
+  const lines = text.split("\n");
+  return (
+    <>
+      {lines.map((line, li) => (
+        <span key={li}>
+          {formatLine(line)}
+          {li < lines.length - 1 ? <br /> : null}
+        </span>
+      ))}
+    </>
+  );
+}
 
-const panel: React.CSSProperties = {
-  borderRight: "1px solid #263238",
-  display: "flex",
-  flexDirection: "column",
-  background: "#121a21",
-};
+function formatLine(line: string): React.ReactNode {
+  const out: React.ReactNode[] = [];
+  let remaining = line;
+  let k = 0;
+  while (remaining.length > 0) {
+    const bold = remaining.match(/^\*\*([^*]+)\*\*/);
+    const code = remaining.match(/^`([^`]+)`/);
+    if (bold) {
+      out.push(
+        <strong key={k++} style={{ color: "#e0e0e0" }}>
+          {bold[1]}
+        </strong>
+      );
+      remaining = remaining.slice(bold[0].length);
+    } else if (code) {
+      out.push(
+        <code key={k++} className="msg-code">
+          {code[1]}
+        </code>
+      );
+      remaining = remaining.slice(code[0].length);
+    } else {
+      const nextIdx = (() => {
+        const a = remaining.indexOf("**");
+        const b = remaining.indexOf("`");
+        const cands = [a, b].filter((n) => n >= 0);
+        return cands.length ? Math.min(...cands) : -1;
+      })();
+      if (nextIdx === -1) {
+        out.push(remaining);
+        break;
+      }
+      out.push(remaining.slice(0, nextIdx));
+      remaining = remaining.slice(nextIdx);
+    }
+  }
+  return <>{out}</>;
+}
 
-const tracePanel: React.CSSProperties = {
-  background: "#0d1117",
-  display: "flex",
-  flexDirection: "column",
-  overflow: "hidden",
-};
+function traceKindColor(kind: TraceKind): string {
+  switch (kind) {
+    case "call":
+      return "#ffcc80";
+    case "transfer":
+      return "#ce93d8";
+    case "result":
+      return "#a5d6a7";
+    case "text":
+      return "#90caf9";
+    case "error":
+      return "#ef9a9a";
+    default:
+      return "#b0bec5";
+  }
+}
 
 export default function App() {
   const [sessionId, setSessionId] = useState(() => crypto.randomUUID().slice(0, 12));
@@ -152,7 +258,7 @@ export default function App() {
   const [messages, setMessages] = useState<ChatMsg[]>([
     {
       role: "assistant",
-      text: "This UI calls ADK **`/run`** (full agent turn) through the Vite proxy—**reliable** with Gemini + tools + sub-agents. After you send, watch the **Trace** panel **replay** each tool step. Start **`adk api_server --port 8000`** from the repo root and keep **`GOOGLE_API_KEY`** set.",
+      text: "This UI drives **`POST /run`** through the Vite proxy (full turn, all events). The **Trace** panel **replays** tool calls, **`transfer_to_agent`** handoffs, and model text. Start **`adk api_server --port 8000`** from the repo root: use **Gemini** (`GOOGLE_API_KEY` in `.env`) or **local Ollama** (no Google key — see README).",
     },
   ]);
   const [input, setInput] = useState("");
@@ -160,6 +266,20 @@ export default function App() {
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [stepLabel, setStepLabel] = useState("");
+  const [lastRunMs, setLastRunMs] = useState<number | null>(null);
+
+  const chatEndRef = useRef<HTMLDivElement>(null);
+  const traceEndRef = useRef<HTMLDivElement>(null);
+
+  const stats = useMemo(() => runStatsFromTrace(trace), [trace]);
+
+  useEffect(() => {
+    chatEndRef.current?.scrollIntoView({ behavior: "smooth", block: "end" });
+  }, [messages, busy]);
+
+  useEffect(() => {
+    traceEndRef.current?.scrollIntoView({ behavior: "smooth", block: "end" });
+  }, [trace]);
 
   useEffect(() => {
     let cancelled = false;
@@ -183,17 +303,18 @@ export default function App() {
     });
     if (r.ok) return true;
     if (r.status === 409 || r.status === 400) return false;
-    const t = await r.text();
-    throw new Error(t || `HTTP ${r.status}`);
+    throw new Error(await readAdkHttpError(r));
   }, []);
 
   const sendMessage = useCallback(
     async (text: string) => {
       const trimmed = text.trim();
       if (!trimmed || busy) return;
+      const t0 = performance.now();
       setError(null);
       setStepLabel("");
       setBusy(true);
+      setLastRunMs(null);
       setMessages((m) => [...m, { role: "user", text: trimmed }]);
       setMessages((m) => [...m, { role: "assistant", text: "" }]);
 
@@ -207,7 +328,7 @@ export default function App() {
           if (!ok) throw new Error("Could not create ADK session");
         }
 
-        setStepLabel("Running agent (Gemini + tools)…");
+        setStepLabel("Running agent (LLM + tools)…");
         const res = await fetch("/run", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
@@ -223,8 +344,12 @@ export default function App() {
         });
 
         if (!res.ok) {
-          const t = await res.text();
-          throw new Error(t || `API ${res.status}`);
+          const detail = await readAdkHttpError(res);
+          throw new Error(
+            res.status === 500 && detail === "Internal Server Error"
+              ? `${detail} — check the **adk api_server** terminal for the traceback (Gemini key/quota, or **Ollama** not running / model not pulled).`
+              : detail
+          );
         }
 
         const raw = await res.json();
@@ -234,7 +359,9 @@ export default function App() {
 
         const events = raw as Record<string, unknown>[];
         if (events.length === 0) {
-          throw new Error("Agent returned no events — check GOOGLE_API_KEY and model access.");
+          throw new Error(
+            "Agent returned no events — check LLM backend (GOOGLE_API_KEY for Gemini, or ollama serve + pulled model for local)."
+          );
         }
 
         setTrace([]);
@@ -253,14 +380,16 @@ export default function App() {
             if (last >= 0 && copy[last].role === "assistant") {
               copy[last] = {
                 role: "assistant",
-                text: textSoFar || `Working… (${i + 1}/${events.length} events)`,
+                text: textSoFar || `Working… (${i + 1}/${events.length} ADK events)`,
               };
             }
             return copy;
           });
-          setStepLabel(`Trace: step ${i + 1} / ${events.length}`);
+          setStepLabel(`Trace: ADK event ${i + 1} / ${events.length}`);
           await delay(Math.min(120, 40 + i * 8));
         }
+
+        setLastRunMs(Math.round(performance.now() - t0));
 
         setMessages((m) => {
           const copy = [...m];
@@ -285,7 +414,7 @@ export default function App() {
           if (last >= 0 && copy[last].role === "assistant") {
             copy[last] = {
               role: "assistant",
-              text: `**Error:** ${msg}\n\n— Is \`adk api_server --port 8000\` running from the repo root?\n— Is \`GOOGLE_API_KEY\` set?\n— Open this app only via \`npm run dev\` (port 5173), not a static file.`,
+              text: `**Error:** ${msg}\n\n— Is \`adk api_server --port 8000\` running from the **repo root** (folder that contains \`drake_talley_adk/\`)?\n— **Ollama:** \`ollama serve\` + \`ollama pull llama3.2\`; remove fake \`GOOGLE_API_KEY\` lines from \`.env\` (placeholders like YOUR_... are ignored — pull latest code).\n— **Gemini:** real long \`GOOGLE_API_KEY\` only.\n— Open via \`npm run dev\` (5173). Read the **api_server** traceback if this is still vague.`,
             };
           }
           return copy;
@@ -299,8 +428,8 @@ export default function App() {
   );
 
   return (
-    <div style={shell}>
-      <div style={panel}>
+    <div className="portfolio-shell">
+      <div className="portfolio-chat">
         <header
           style={{
             padding: "14px 18px",
@@ -324,27 +453,15 @@ export default function App() {
             {stepLabel ? (
               <span style={{ color: "#4dd0e1", marginLeft: 8 }}>{stepLabel}</span>
             ) : null}
+            {lastRunMs != null && !busy ? (
+              <span style={{ color: "#78909c", marginLeft: 8 }}>· last run {lastRunMs} ms</span>
+            ) : null}
           </div>
         </header>
 
         <div style={{ padding: "10px 14px", display: "flex", flexWrap: "wrap", gap: 8 }}>
           {PRESETS.map((p) => (
-            <button
-              key={p.label}
-              type="button"
-              disabled={busy}
-              onClick={() => sendMessage(p.text)}
-              style={{
-                fontSize: "0.75rem",
-                padding: "8px 12px",
-                borderRadius: 6,
-                border: "1px solid #37474f",
-                background: busy ? "#263238" : "#1c2832",
-                color: "#eceff1",
-                cursor: busy ? "wait" : "pointer",
-                fontWeight: 500,
-              }}
-            >
+            <button key={p.label} type="button" disabled={busy} className="preset-btn" onClick={() => sendMessage(p.text)}>
               {p.label}
             </button>
           ))}
@@ -358,6 +475,7 @@ export default function App() {
             display: "flex",
             flexDirection: "column",
             gap: 12,
+            minHeight: 0,
           }}
         >
           {messages.map((msg, i) => (
@@ -375,10 +493,14 @@ export default function App() {
                 lineHeight: 1.45,
               }}
             >
-              {msg.text ||
-                (msg.role === "assistant" && busy ? "…" : "")}
+              {msg.text ? (
+                <FormattedMessage text={msg.text} />
+              ) : msg.role === "assistant" && busy ? (
+                <span style={{ color: "#78909c" }}>Running…</span>
+              ) : null}
             </div>
           ))}
+          <div ref={chatEndRef} />
         </div>
 
         <div style={{ padding: 12, borderTop: "1px solid #263238", background: "#0d1318" }}>
@@ -392,7 +514,7 @@ export default function App() {
               onKeyDown={(e) =>
                 e.key === "Enter" && !e.shiftKey && (e.preventDefault(), sendMessage(input), setInput(""))
               }
-              placeholder="Message drake_talley_portfolio…"
+              placeholder="Message drake_talley_adk…"
               disabled={busy}
               style={{
                 flex: 1,
@@ -427,7 +549,7 @@ export default function App() {
         </div>
       </div>
 
-      <div style={tracePanel}>
+      <div className="portfolio-trace">
         <div
           style={{
             padding: "12px 14px",
@@ -436,29 +558,49 @@ export default function App() {
             fontSize: "0.9rem",
           }}
         >
-          Trace · tools & agents (live replay)
+          Trace · tools, handoffs & agents
         </div>
         <div style={{ fontSize: "0.72rem", padding: "8px 14px", color: "#78909c" }}>
-          Each row is one ADK event: **functionCall** → **functionResponse** → model **text**. Authors show
-          which agent acted (e.g. aml_alert_orchestrator).
+          <strong style={{ color: "#90a4ae" }}>[transfer]</strong> rows are{" "}
+          <code className="msg-code">transfer_to_agent</code> — LLM-chosen delegation. Tool calls and results are
+          grounded data from this repo.
         </div>
-        <div style={{ flex: 1, overflowY: "auto", padding: "0 10px 16px" }}>
+        {trace.length > 0 ? (
+          <div className="trace-stats">
+            <span className="trace-stat-pill">
+              trace steps <strong>{stats.steps}</strong>
+            </span>
+            <span className="trace-stat-pill">
+              tool calls <strong>{stats.toolCalls}</strong>
+            </span>
+            <span className="trace-stat-pill">
+              handoffs <strong>{stats.handoffs}</strong>
+            </span>
+            <span className="trace-stat-pill">
+              agents <strong>{stats.agents.length}</strong>
+            </span>
+            {stats.agents.length > 0 ? (
+              <span className="trace-stat-pill" title={stats.agents.join(", ")}>
+                <span style={{ maxWidth: 220, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+                  {stats.agents.join(" · ")}
+                </span>
+              </span>
+            ) : null}
+          </div>
+        ) : null}
+        <div style={{ flex: 1, overflowY: "auto", padding: "0 10px 16px", minHeight: 0 }}>
           {trace.length === 0 ? (
             <div style={{ color: "#546e7a", padding: 12, fontSize: "0.85rem" }}>
-              Run a preset — the trace fills as the agent executes tools (deterministic CRM / AML data + Gemini
-              reasoning).
+              Run a preset — watch tool calls and agent handoffs replay step by step (synthetic CRM / AML data +
+              local or cloud LLM).
             </div>
           ) : (
             trace.map((t, idx) => (
               <details
                 key={`${t.id}-${idx}`}
-                open={t.kind === "call" || t.kind === "result" || t.kind === "error"}
-                style={{
-                  marginBottom: 8,
-                  border: "1px solid #263238",
-                  borderRadius: 8,
-                  background: "#161b22",
-                }}
+                open={t.kind === "call" || t.kind === "transfer" || t.kind === "result" || t.kind === "error"}
+                className="trace-row"
+                style={{ borderLeft: t.kind === "transfer" ? "3px solid #ce93d8" : undefined }}
               >
                 <summary
                   style={{
@@ -466,27 +608,17 @@ export default function App() {
                     padding: "8px 10px",
                     fontSize: "0.78rem",
                     listStyle: "none",
+                    display: "flex",
+                    alignItems: "center",
+                    flexWrap: "wrap",
+                    gap: 4,
                   }}
                 >
-                  <span
-                    style={{
-                      color:
-                        t.kind === "call"
-                          ? "#ffcc80"
-                          : t.kind === "result"
-                            ? "#a5d6a7"
-                            : t.kind === "text"
-                              ? "#90caf9"
-                              : t.kind === "error"
-                                ? "#ef9a9a"
-                                : "#b0bec5",
-                    }}
-                  >
-                    [{t.kind}]
-                  </span>{" "}
-                  {t.title}
+                  <span className="trace-row-index">{idx + 1}</span>
+                  <span style={{ color: traceKindColor(t.kind), fontWeight: 700 }}>[{t.kind}]</span>
+                  <span>{t.title}</span>
                   {t.author ? (
-                    <span style={{ color: "#78909c", marginLeft: 8 }}>@ {t.author}</span>
+                    <span style={{ color: "#78909c", marginLeft: "auto" }}>@ {t.author}</span>
                   ) : null}
                 </summary>
                 {t.body ? (
@@ -507,6 +639,7 @@ export default function App() {
               </details>
             ))
           )}
+          <div ref={traceEndRef} />
         </div>
       </div>
     </div>

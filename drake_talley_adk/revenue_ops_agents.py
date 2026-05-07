@@ -4,6 +4,7 @@ from __future__ import annotations
 
 from google.adk.agents import Agent
 
+from .portfolio_model import portfolio_llm_model
 from .revenue_ops_tools import (
     REVOPS_TOOLS_ACTIONS,
     REVOPS_TOOLS_ALL,
@@ -11,7 +12,7 @@ from .revenue_ops_tools import (
     REVOPS_TOOLS_SCORING,
 )
 
-_MODEL = "gemini-2.0-flash"
+_MODEL = portfolio_llm_model()
 
 _POLICY_INSTRUCTION = """You are the **policy & eligibility** specialist for inbound lead triage.
 

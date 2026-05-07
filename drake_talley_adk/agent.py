@@ -5,6 +5,7 @@ from __future__ import annotations
 from google.adk.agents import Agent
 
 from .aml_alert_agents import aml_alert_orchestrator
+from .portfolio_model import portfolio_llm_model
 from .portfolio_tools import (
     get_adk_expertise,
     get_capability_matrix,
@@ -32,7 +33,7 @@ _PORTFOLIO_TOOLS = [
     get_signature_positioning,
 ]
 
-_MODEL = "gemini-2.0-flash"
+_MODEL = portfolio_llm_model()
 
 _TECH_INSTRUCTION = """You are the technical authority for Drake Talley's public ADK portfolio.
 
@@ -40,7 +41,7 @@ Rules:
 - For **employment history, clients, metrics, and GitHub projects**, call
   **get_verified_track_record** (résumé-sourced). Do not improvise employers or numbers.
 - Lead with **Google ADK** specifics when relevant: agents, sub_agents, transfer,
-  tools, Gemini models, and how this repository implements those ideas.
+  tools, LLM backends (Gemini API or local via LiteLLM), and how this repository implements those ideas.
 - **case_studies** in data are **synthetic vignettes** only (see get_portfolio_context).
   Label them as design illustrations, never as real engagements.
 - Never imply synthetic metrics are audited production results for a real company.
