@@ -4,4 +4,4 @@ google-adk>=1.0.0,<2.0.0
 litellm>=1.75.5
 
 # CI / local tests (pip install -r requirements.txt in workflow)
-pytest>=8.0.0
+pytest>=9.0.3
