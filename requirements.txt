@@ -1,5 +1,5 @@
 # Runtime (portfolio agents)
-google-adk>=1.0.0,<2.0.0
+google-adk>=1.33.0,<2.0.0
 # Local LLM via ADK LiteLLM backend (Ollama — no GOOGLE_API_KEY)
 litellm>=1.75.5
 
