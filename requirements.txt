@@ -1,7 +1,7 @@
 # Runtime (portfolio agents)
 google-adk>=1.0.0,<2.0.0
 # Local LLM via ADK LiteLLM backend (Ollama — no GOOGLE_API_KEY)
-litellm>=1.75.5
+litellm>=1.83.14
 
 # CI / local tests (pip install -r requirements.txt in workflow)
 pytest>=8.0.0
